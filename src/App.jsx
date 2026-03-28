@@ -1,8 +1,12 @@
-function App() {
+import Signup from "./Components/Signup"
+import Login from "./Components/Login"
+import Settlement from "./Components/Settlement"
 
+function App() {
+  const usernames = ["Anshul", "Vidhi", "Anjali", "Mohini"]
   return (
     <>
-    <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <Settlement usernames={usernames} />
     </>
   )
 }

@@ -23,7 +23,7 @@ function Expense_Summary() {
             </div>
 
             {/* 1. Grand Total Card */}
-            <div className="bg-indigo-600 rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-200 mb-10 relative overflow-hidden">
+            <div className="bg-indigo-600 rounded-2xl p-8 text-white shadow-xl shadow-indigo-200 mb-10 relative overflow-hidden">
                 <div className="relative z-10">
                     <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-2">Total Spends</p>
                     <h1 className="text-5xl font-black">₹{totalCost.toLocaleString()}</h1>

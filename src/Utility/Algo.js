@@ -1,4 +1,12 @@
-
+const Details = {
+    members: ["Anshul", "Vidhi", "Mohini", "Anjali"],
+    expenses: [
+        { amount: 6500, paidBy: "Anshul", splitAmong: ["Anshul", "Vidhi", "Anjali", "Mohini"] },
+        { amount: 800, paidBy: "Vidhi", splitAmong: ["Anshul", "Anjali", "Mohini"] },
+        { amount: 200, paidBy: "Mohini", splitAmong: ["Anshul", "Vidhi", "Anjali", "Mohini"] },
+        { amount: 100, paidBy: "Anjali", splitAmong: ["Anshul", "Vidhi", "Anjali", "Mohini"] },
+    ]
+};
 
 export function splitExpenses(details) {
     const { members, expenses } = details;

@@ -1,14 +1,17 @@
-import Signup from "./Components/Signup"
-import Login from "./Components/Login"
-import Settlement from "./Components/Settlement"
+import { useState } from "react";
+import Add_Members from "./Components/Add_Members";
 
-function App() {
-  const usernames = ["Anshul", "Vidhi", "Anjali", "Mohini"]
+
+function App({ members, setMembers }) {
+
+
   return (
-    <>
-      <Settlement usernames={usernames} />
-    </>
-  )
+    <div className="min-h-screen bg-gray-50 ">
+      {/* Section 1: Adding People */}
+      <Add_Members members={members} setMembers={setMembers} />
+      
+    </div>
+  );
 }
 
 export default App;

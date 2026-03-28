@@ -45,10 +45,11 @@ function Select_Expense({ members }) {
         const newExpense = {
             id: Date.now(),
             payerId: selectedMember,
-            payerName: members.find(m => m.id === selectedMember)?.name,
+            paidBy: members.find(m => m.id === selectedMember)?.name,
             category: selectedCategory,
             item: selectedSub,
-            amount: parseFloat(finalInrValue)
+            amount: parseFloat(finalInrValue),
+            splitAmong: [...members.map(member => member.name)]
         };
 
         setExpenses([...expenses, newExpense]);

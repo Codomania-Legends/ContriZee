@@ -8,6 +8,7 @@ import Add_Members from './Components/Add_Members'
 import Select_Expense from './Components/Select_Expense'
 import { useState } from 'react'
 import Expense_Summary from './Components/Expense_Summary'
+import Settlement from './Components/Settlement.jsx'
 
 const Root = () => {
   const [members, setMembers] = useState([]); // Move state here
@@ -16,9 +17,9 @@ const Root = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App members={members} setMembers={setMembers} />} />
-        {/* <Route path="/trip-details" element={<Trip_Details members={members} />} /> */}
         <Route path="/select-expense" element={<Select_Expense members={members} />} />
         <Route path="/expense-summary" element={<Expense_Summary members={members} />} />
+        <Route path="/settle-debts" element={<Settlement members={members} />} />
       </Routes>
     </BrowserRouter>
   );

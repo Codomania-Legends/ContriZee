@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { splitExpenses } from '../Utility/Algo';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import Xarrow from 'react-xarrows'; // Ensure this is installed: npm install react-xarrows
 
 const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"]; // Add more colors if needed
@@ -8,6 +8,7 @@ const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"]; // Add m
 function Settlement({ members }) {
     const [transactions, setTransactions] = useState([]);
     const location = useLocation();
+    const navigate = useNavigate()
     const expenses = location?.state?.expenses || [];
 
     useEffect(() => {
@@ -140,6 +141,17 @@ function Settlement({ members }) {
                     }
                 `}
             </style>
+            {expenses.length > 0 && (
+                <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto">
+                    <button 
+                        onClick={() => navigate('/expense-summary', { state: { expenses } })}
+                        className="w-full bg-black text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl"
+                    >
+                        <span>View {expenses.length} Expenses</span>
+                        <span>→</span>
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

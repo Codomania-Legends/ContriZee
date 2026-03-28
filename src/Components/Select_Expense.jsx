@@ -214,7 +214,7 @@ function Select_Expense({ members }) {
             {expenses.length > 0 && (
                 <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto">
                     <button 
-                        onClick={() => navigate('/expense-summary', { state: { expenses } })}
+                        onClick={() => navigate('/expense-summary', { state: { expenses, members } })}
                         className="w-full bg-black text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl"
                     >
                         <span>View {expenses.length} Expenses</span>

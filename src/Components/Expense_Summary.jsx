@@ -1,42 +1,46 @@
-import React, { useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useUser } from '../UserContext'; 
 
 function Expense_Summary() {
-    const location = useLocation();
     const navigate = useNavigate();
     
-    // Get the expenses passed from the Select_Expense page
-    const expenses = location.state?.expenses || [];
-
-    // Calculate the Total Trip Cost
+    // Pull the real-time synced expenses directly from Context! 📥🔥
+    const { expenses } = useUser();
+    
+    // Calculate the Total Trip Cost 🧮
     const totalCost = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
-    useEffect( () => {
-        expenses.length === 0 ? navigate("/select-expense") : null
-    } , [expenses] )
+    useEffect(() => {
+        if (expenses.length === 0) {
+           // navigate("/select-expense"); // Optional: You might want to remove this so they can see an empty summary page! 🏜️
+        }
+    }, [expenses, navigate]);
 
     return (
-        <div className="max-w-md mx-auto p-6 min-h-screen">
-            {/* Header */}
+       /* KEEP ALL YOUR RETURN JSX EXACTLY THE SAME AS BEFORE! 🎨 */
+       <div className="max-w-md mx-auto p-6 min-h-screen">
+            {/* Header 🏷️ */}
             <div className="flex items-center justify-between mb-8">
-                <button onClick={() => navigate("/select-expense" , {state: {expenses}})} className="text-gray-400 hover:text-black transition-colors">
+                {/* Changed the back button to just navigate to the route without passing state! 🔙 */}
+                <button onClick={() => navigate("/select-expense")} className="text-gray-400 hover:text-black transition-colors">
                     ← Back
                 </button>
-                <h2 className="text-xl font-black tracking-tighter uppercase italic">Trip Summary</h2>
-                <div className="w-6"></div> {/* Spacer for balance */}
+                <h2 className="text-xl font-black tracking-tighter uppercase italic">Trip Summary 🎒</h2>
+                <div className="w-6"></div> {/* Spacer for balance ⚖️ */}
             </div>
 
-            {/* 1. Grand Total Card */}
-            <div className="bg-indigo-600 medium-box-shadow rounded-2xl p-8 text-white shadow-xl shadow-indigo-200 mb-10 relative overflow-hidden">
+            {/* 1. Grand Total Card 💳 */}
+            <div className="bg-indigo-600 medium-box-shadow rounded-2xl p-8 shadow-xl shadow-indigo-200 mb-10 relative overflow-hidden">
                 <div className="relative z-10">
                     <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-2">Total Spends</p>
                     <h1 className="text-5xl font-black">₹{totalCost.toLocaleString()}</h1>
                 </div>
-                {/* Decorative background circle */}
+                {/* Decorative background circle 🎨 */}
                 <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500 rounded-full opacity-50"></div>
             </div>
 
-            {/* 2. Transaction List */}
+            {/* 2. Transaction List 📜 */}
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4 px-2">History</h3>
             <div className="space-y-4">
                 {expenses.length > 0 ? (
@@ -58,28 +62,28 @@ function Expense_Summary() {
                     ))
                 ) : (
                     <div className="text-center py-20">
-                        <p className="text-gray-400 italic">No expenses recorded yet.</p>
+                        <p className="text-gray-400 italic">No expenses recorded yet. 🏜️</p>
                     </div>
                 )}
             </div>
 
-            {/* 3. Action Button: The Settlement Algorithm */}
+            {/* 3. Action Button: The Settlement Algorithm ⚙️ */}
             {expenses.length > 0 && (
                 <div className="mt-10">
                     <button 
                         onClick={() => navigate('/settle-debts', { state: { expenses } })}
-                        className="w-full bg-black small-box-shadow text-white py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3"
+                        className="w-full bg-black small-box-shadow text-black py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3"
                     >
                         <span>Calculate Smart Settlement</span>
-                        <span className="bg-white/20 px-2 py-0.5 rounded text-xs">AI Optimized</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded text-xs">AI Optimized 🧠</span>
                     </button>
                     <p className="text-center text-[10px] text-gray-400 mt-4 leading-relaxed px-6">
-                        Clicking this will run the greedy algorithm to minimize the total number of transactions between friends.
+                        Clicking this will run the greedy algorithm to minimize the total number of transactions between friends. 🤝
                     </p>
                 </div>
             )}
         </div>
-    )
+    );
 }
 
-export default Expense_Summary
+export default Expense_Summary;

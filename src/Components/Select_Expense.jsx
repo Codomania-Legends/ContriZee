@@ -1,23 +1,26 @@
 import { ref, push, set } from 'firebase/database';
-import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router'; // or 'react-router-dom'
 import { db } from '../firebase';
+import { useUser } from '../UserContext'; // 🪄 Import Context
 
-function Select_Expense({ members, user }) {
+function Select_Expense() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    // 1. Pull user and members directly from Context! 📥
+    const { user, members } = useUser();
 
     // Selection States
     const [selectedMember, setSelectedMember] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSub, setSelectedSub] = useState(null);
-    const [amount, setAmount] = useState("");
-
-    // Add these to your state definitions at the top of Select_Expense
+    
+    // Currency States
     const [currency, setCurrency] = useState("INR");
     const [convertedAmount, setConvertedAmount] = useState("");
 
-    // Current approximate rates (Update these as needed)
+    // Current approximate rates (Update these as needed) 💱
     const rates = { 
         INR: 1, 
         USD: 94.86, 
@@ -30,10 +33,15 @@ function Select_Expense({ members, user }) {
         const symbols = { INR: "₹", USD: "$", EUR: "€", GBP: "£" };
         return symbols[code] || "₹";
     };
+
     // This state stores all confirmed payments
     const [expenses, setExpenses] = useState([]);
 
-    useEffect( () => {setExpenses(location.state?.expenses.length > 0 ? location.state.expenses : [])} , [] )
+    useEffect(() => {
+        // Load existing expenses from state if returning from the summary page 🔙
+        setExpenses(location.state?.expenses?.length > 0 ? location.state.expenses : []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const categories = {
         Food: { icon: "🍔", items: ["Breakfast", "Lunch", "Dinner", "Snacks", "Drinks", "Water Bottle", "Other"] },
@@ -41,55 +49,56 @@ function Select_Expense({ members, user }) {
         Travel: { icon: "🚕", items: ["Cab", "Toll", "Tickets", "Personal Vehicle( Petrol/Diesel/CNG )", "Parking", "Public Transport", "Other"] }
     };
 
+    const handleAddExpense = (finalInrValue) => {
+        const numericAmount = parseFloat(finalInrValue);
 
-const handleAddExpense = (finalInrValue) => {
-    const numericAmount = parseFloat(finalInrValue);
+        // 1. Validation (Always a good idea to keep this active) 🛡️
+        if (!selectedMember || !selectedSub || isNaN(numericAmount)) {
+            alert("Please complete all selections and enter a valid amount! 🛑");
+            return;
+        }
 
-    // 1. Validation (Always a good idea to keep this active)
-    if (!selectedMember || !selectedSub || isNaN(numericAmount)) {
-        alert("Please complete all selections and enter a valid amount!");
-        return;
-    }
+        const payer = members.find(m => m.id === selectedMember);
 
-    const payer = members.find(m => m.id === selectedMember);
+        const newExpense = {
+            id: Date.now(), // Local unique ID
+            payerId: selectedMember,
+            paidBy: payer ? payer.name : "Unknown",
+            category: selectedCategory,
+            item: selectedSub,
+            amount: numericAmount,
+            // Using IDs for splitAmong is usually safer than names
+            splitAmong: members.map(member => member.name) 
+        };
 
-    const newExpense = {
-        id: Date.now(), // Local unique ID
-        payerId: selectedMember,
-        paidBy: payer ? payer.name : "Unknown",
-        category: selectedCategory,
-        item: selectedSub,
-        amount: numericAmount,
-        // Using IDs for splitAmong is usually safer than names
-        splitAmong: members.map(member => member.name) 
+        // 2. Update Firebase with a unique key ☁️
+        const expenseListRef = ref(db, `users/${user}/expenses`);
+        const newExpenseRef = push(expenseListRef); // Creates a new unique ID in Firebase
+        
+        set(newExpenseRef, newExpense)
+            .then(() => {
+                // 3. Update local state only after successful DB write ✅
+                setExpenses(prev => [...prev, { ...newExpense, firebaseKey: newExpenseRef.key }]);
+                
+                // Reset fields (FIXED: resetting convertedAmount instead of unused 'amount') 🧹
+                setSelectedSub(null);
+                setConvertedAmount(""); 
+                // alert("Expense Added! 🎉"); // Optional: Might be annoying after a while
+            })
+            .catch((error) => {
+                console.error("Data could not be saved." + error);
+                alert("Failed to save expense. Please try again. ⚠️");
+            });
     };
 
-    // 2. Update Firebase with a unique key
-    const expenseListRef = ref(db, `users/${user}/expenses`);
-    const newExpenseRef = push(expenseListRef); // Creates a new unique ID in Firebase
-    
-    set(newExpenseRef, newExpense)
-        .then(() => {
-            // 3. Update local state only after successful DB write
-            setExpenses(prev => [...prev, { ...newExpense, firebaseKey: newExpenseRef.key }]);
-            
-            // Reset fields
-            setSelectedSub(null);
-            setAmount("");
-            alert("Expense Added!");
-        })
-        .catch((error) => {
-            console.error("Data could not be saved." + error);
-        });
-};
     return (
-        <div className="max-w-md mx-auto p-6 min-h-screen">
+        <div className="max-w-md mx-auto p-6 min-h-screen pb-24"> {/* Added pb-24 so the floating button doesn't cover content! */}
             
-            {/* 1. Team Members Row */}
+            {/* 1. Team Members Row 👤 */}
             <div className="mb-8 text-center">
                 <h3 className="text-gray-500 text-xs font-bold mb-4 tracking-widest uppercase">1. Who Paid?</h3>
                 <div className="flex justify-center gap-6">
-                    {members.map((m) => (
+                    {members && members.map((m) => (
                         <div key={m.id} className="flex flex-col items-center gap-2">
                             <button 
                                 onClick={() => {
@@ -99,7 +108,7 @@ const handleAddExpense = (finalInrValue) => {
                                 }}
                                 className={`w-14 h-14 small-box-shadow rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
                                     selectedMember === m.id 
-                                    ? 'pink text-white scale-110' 
+                                    ? 'pink text-black scale-110' 
                                     : 'border-gray-300 text-gray-400 '
                                 }`}
                             >
@@ -111,7 +120,7 @@ const handleAddExpense = (finalInrValue) => {
                 </div>
             </div>
 
-            {/* 2. Categories Row */}
+            {/* 2. Categories Row 🏷️ */}
             {selectedMember && (
                 <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
                     <div className="flex justify-around items-center pink text p-4 rounded-2xl medium-box-shadow">
@@ -129,7 +138,7 @@ const handleAddExpense = (finalInrValue) => {
                                 }`}>
                                     {selectedCategory === cat && <div className="w-2.5 h-2.5 bg-emerald-200 rounded-full" />}
                                 </div>
-                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-emerald-200' : 'text-white'}`}>
+                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-emerald-200' : 'text-black'}`}>
                                     {cat}
                                 </span>
                             </button>
@@ -138,7 +147,7 @@ const handleAddExpense = (finalInrValue) => {
                 </div>
             )}
 
-            {/* 3. Sub-Categories Grid */}
+            {/* 3. Sub-Categories Grid 🗂️ */}
             {selectedCategory && (
                 <div className="grid grid-cols-2 gap-3 animate-in fade-in zoom-in-95 duration-300">
                     {categories[selectedCategory].items.map((item) => (
@@ -162,9 +171,9 @@ const handleAddExpense = (finalInrValue) => {
                 </div>
             )}
 
-            {/* 4. Amount & Save Section */}
+            {/* 4. Amount & Save Section 💰 */}
             {selectedSub && (
-                <div className="mt-6 p-6 medium-box-shadow rounded-[2.5rem] text-white shadow-xl animate-in slide-in-from-bottom-6 transition-all">
+                <div className="mt-6 p-6 medium-box-shadow rounded-[2.5rem] text-black shadow-xl animate-in slide-in-from-bottom-6 transition-all">
                     
                     {/* Header with Multi-Currency Selector */}
                     <div className="flex justify-between items-center mb-6">
@@ -175,16 +184,13 @@ const handleAddExpense = (finalInrValue) => {
                             {Object.keys(rates).map((code) => (
                                 <button 
                                     key={code}
-                                    onClick={() => {
-                                        setCurrency(code);
-                                        // We don't reset amount so users can see the conversion immediately
-                                    }}
+                                    onClick={() => setCurrency(code)}
                                     className={`px-2 py-1 rounded-lg text-[10px] font-black transition-all ${
-                                        currency === code ? 'bg-white text-[#e7b9d8]' : 'text-[#8f577c] hover:text-white'
+                                        currency === code ? 'bg-white text-[#e7b9d8]' : 'text-[#8f577c] hover:text-black'
                                     }`}
                                 >
                                     {code}
-                            </button>
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -225,19 +231,21 @@ const handleAddExpense = (finalInrValue) => {
                             handleAddExpense(finalInrValue);
                         }}
                         className={`w-full small-box-shadow py-4 rounded-2xl font-black text-lg active:scale-95 transition-all ${
-                            convertedAmount > 0 ? 'darkpink text-white' : 'bg-indigo-800 text-indigo-600'
+                            convertedAmount > 0 ? 'darkpink text-black' : 'bg-indigo-800 text-indigo-600'
                         }`}
                     >
                         {convertedAmount > 0 ? "CONFIRM & ADD" : "ENTER AMOUNT"}
                     </button>
                 </div>
             )}
-            {/* 5. Floating Navigation Button */}
+            
+            {/* 5. Floating Navigation Button 🚀 */}
             {expenses.length > 0 && (
-                <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto">
+                <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto z-50">
                     <button 
-                        onClick={() => navigate('/expense-summary', { state: { expenses, members } })}
-                        className="w-full black small-box-shadow text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl"
+                        // Note: We don't need to pass 'members' in state anymore because it's in Context!
+                        onClick={() => navigate('/expense-summary', { state: { expenses } })}
+                        className="w-full black small-box-shadow text-black py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl active:scale-95 transition-transform"
                     >
                         <span>View {expenses.length} Expenses</span>
                         <span>→</span>
@@ -245,7 +253,7 @@ const handleAddExpense = (finalInrValue) => {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
-export default Select_Expense
+export default Select_Expense;

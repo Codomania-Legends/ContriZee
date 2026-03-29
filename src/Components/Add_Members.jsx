@@ -1,10 +1,20 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router';
 
-function Add_Members({ members, setMembers }) {
+function Add_Members({ user, members, setMembers }) {
     const [tempName, setTempName] = useState("");
+    useEffect(() => {
+        console.log("user", user)
+        if(user){
+        setTempName(user)
+        addMember()
 
+        }
+    }, [user]);
+    useEffect(() => {
+        console.log("members", members)
+    }, [members]);
     const addMember = () => {
         if (tempName.trim()) {
             setMembers([...members, { id: Date.now(), name: tempName.trim() }]);
@@ -16,9 +26,8 @@ function Add_Members({ members, setMembers }) {
         setMembers(members.filter((m) => m.id !== id));
     };
 
-    // --- NEXT ACTION LOGIC ---
-    // We determine the button's state based on how many members are added.
-    const canGoNext = members.length >= 2; // Usually need at least 2 people to split!
+
+    const canGoNext = members.length >= 2;
     const buttonText = canGoNext 
         ? "Ready to Split? Click Here →" 
         : `Add ${2 - members.length} more friend${members.length === 1 ? '' : 's'}`;

@@ -1,17 +1,30 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-function Login({usernames}) {
+function Login({usernames, setUser, user}) {
     const navigate = useNavigate();
     const [field, setField] = useState({
         username: ""
     })
-    function HandleSubmit(e){
-        e.preventDefault();
+    useEffect( () => {
+        console.log("user", user)
+        if(user){
+            navigate("/add-members")
+        }
+    }, [user] )
+    function HandleSubmit(e) {
+    e.preventDefault();
+    if (field.username === "") return alert("Please enter the username");
+
+    if (usernames.includes(field.username)) {
+        setUser(field.username);
+        // FIX: Added path=/ and ensured this runs only on success
+        document.cookie = `username=${field.username}; path=/; max-age=86400`; 
         navigate("/add-members");
-        alert("Login Successfull")
-        return field.username === "" ? alert("Please enter the username") : usernames.includes(field.username) ? alert("Login Successfull") : alert("No user Found")
+    } else {
+        alert("No user Found");
     }
+}
     return (
         <div className='flex justify-center items-center h-screen'>
             <div className='w-[40%] h-[40%] flex justify-center items-center flex-col'>

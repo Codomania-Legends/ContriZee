@@ -1,7 +1,9 @@
+import { ref, push, set } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router';
+import { db } from '../firebase';
 
-function Select_Expense({ members }) {
+function Select_Expense({ members, user }) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -39,30 +41,47 @@ function Select_Expense({ members }) {
         Travel: { icon: "🚕", items: ["Cab", "Toll", "Tickets", "Personal Vehicle( Petrol/Diesel/CNG )", "Parking", "Public Transport", "Other"] }
     };
 
-    const handleAddExpense = (finalInrValue) => {
-        // if (!selectedMember || !selectedSub || !amount) {
-        //     alert("Please complete all selections and enter an amount!");
-        //     return;
-        // }
 
-        const newExpense = {
-            id: Date.now(),
-            payerId: selectedMember,
-            paidBy: members.find(m => m.id === selectedMember)?.name,
-            category: selectedCategory,
-            item: selectedSub,
-            amount: parseFloat(finalInrValue),
-            splitAmong: [...members.map(member => member.name)]
-        };
+const handleAddExpense = (finalInrValue) => {
+    const numericAmount = parseFloat(finalInrValue);
 
-        setExpenses([...expenses, newExpense]);
-        
-        // Reset fields for the next entry
-        setSelectedSub(null);
-        setAmount("");
-        alert("Expense Added!");
+    // 1. Validation (Always a good idea to keep this active)
+    if (!selectedMember || !selectedSub || isNaN(numericAmount)) {
+        alert("Please complete all selections and enter a valid amount!");
+        return;
+    }
+
+    const payer = members.find(m => m.id === selectedMember);
+
+    const newExpense = {
+        id: Date.now(), // Local unique ID
+        payerId: selectedMember,
+        paidBy: payer ? payer.name : "Unknown",
+        category: selectedCategory,
+        item: selectedSub,
+        amount: numericAmount,
+        // Using IDs for splitAmong is usually safer than names
+        splitAmong: members.map(member => member.name) 
     };
 
+    // 2. Update Firebase with a unique key
+    const expenseListRef = ref(db, `users/${user}/expenses`);
+    const newExpenseRef = push(expenseListRef); // Creates a new unique ID in Firebase
+    
+    set(newExpenseRef, newExpense)
+        .then(() => {
+            // 3. Update local state only after successful DB write
+            setExpenses(prev => [...prev, { ...newExpense, firebaseKey: newExpenseRef.key }]);
+            
+            // Reset fields
+            setSelectedSub(null);
+            setAmount("");
+            alert("Expense Added!");
+        })
+        .catch((error) => {
+            console.error("Data could not be saved." + error);
+        });
+};
     return (
         <div className="max-w-md mx-auto p-6 min-h-screen">
             

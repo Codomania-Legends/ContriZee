@@ -1,17 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
+import { getDatabase, ref, set, child } from 'firebase/database';
 
-function Signup({usernames}) {
+function Signup({usernames, setUser}) {
     const navigate = useNavigate();
     const [field, setField] = useState({
         username: "",
         nickname: ""
     })
+    const dataSet = () => {
+        const dbRef = ref(getDatabase());
+        set(child(dbRef, `users/${field.username}`), {
+            username: field.username,
+            nickname: field.nickname
+        })
+    }
     function HandleSubmit(e){
         e.preventDefault();
-        navigate("/add-members")
-        alert("Account created successfully")
-        return field.username === "" || field.nickname === "" ? alert("Please fill all the fields") : usernames.includes(field.username) ? alert("Username already exists") : alert("Username is available")
+        console.log("usernames", usernames)
+        if( field.username === "" || field.nickname === "" ) return alert("Please fill all the fields")
+        else if( usernames.includes(field.username) ) return alert("Username already exists")
+        else dataSet() 
+        setUser(field.username)
+        document.cookie = `username=${field.username}`
+        navigate("/add-members")           
     }
     return (
         <div className='flex justify-center items-center h-screen'>

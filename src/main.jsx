@@ -10,9 +10,39 @@ import Expense_Summary from './Components/Expense_Summary'
 import Settlement from './Components/Settlement.jsx'
 import Signup from './Components/Signup.jsx'
 import Login from './Components/Login.jsx'
+import { ref, get, child, push } from 'firebase/database';
+import { db } from './firebase.js'
 
 const Root = () => {
-  const [members, setMembers] = useState([]); // Move state here
+  const [usernames, setUsernames] = useState([]);
+  const [user, setUser] = useState(null);
+  const [members, setMembers] = useState([]);
+  
+  useEffect(() => {
+    const cookies = document.cookie.split(";");
+    const userCookie = cookies.find(row => row.trim().startsWith("username="));
+    
+    if (userCookie) {
+        const cookieValue = userCookie.split("=")[1];
+        setUser(cookieValue);
+    }
+    get(child(ref(db), `users`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const userList = snapshot.val();
+          for (const element in userList) {
+            setUsernames(prev => [...prev, element])
+          }
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error("Firebase Error:", error);
+      });
+  }, []);
+
+
   const HomeLayout = () => (
     <div className='home-main-container'>
       <img src="/Background.svg" alt="Background" className='bgImg' />
@@ -23,15 +53,13 @@ const Root = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<HomeLayout />}>
-          <Route path='/' element={ <Signup/> }/>
-          <Route path='/login' element={ <Login/> }/>
+          <Route path='/' element={ <Signup setUser={setUser} usernames={usernames}/> }/>
+          <Route path='/login' element={ <Login setUser={setUser} usernames={usernames}/> }/>
         </Route>
-        <Route path="/add-members" element={<App members={members} setMembers={setMembers} />} />
-        <Route path="/select-expense" element={<Select_Expense members={members} />} />
-        <Route path="/expense-summary" element={<Expense_Summary members={members} />} />
-        <Route path="/settle-debts" element={<Settlement members={members} />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/add-members" element={<App user={user} members={members} setMembers={setMembers} />} />
+        <Route path="/select-expense" element={<Select_Expense user={user} members={members} />} />
+        <Route path="/expense-summary" element={<Expense_Summary user={user} members={members} />} />
+        <Route path="/settle-debts" element={<Settlement user={user} members={members} />} />
       </Routes>
     </BrowserRouter>
   );

@@ -58,58 +58,79 @@ function Settlement({ members }) {
             <div style={{ position: 'relative', width: '600px', height: '600px', margin: '0 auto', zIndex: 1 }}>
                 
                 {members.map((m, index) => {
-                    const angle = (index / members.length) * 2 * Math.PI;
-                    const x = center.x + radius * Math.cos(angle) - 60;
-                    const y = center.y + radius * Math.sin(angle) - 60;
+    const angle = (index / members.length) * 2 * Math.PI;
+    const x = center.x + radius * Math.cos(angle) - 60;
+    const y = center.y + radius * Math.sin(angle) - 60;
 
-                    // Check if this person has to pay someone
-                    const pendingTransactionIdx = transactions.findIndex(t => t.from === m.name);
-                    const pendingTransaction = transactions[pendingTransactionIdx];
+    const pendingTransactionIdx = transactions.findIndex(t => t.from === m.name);
+    const pendingTransaction = transactions[pendingTransactionIdx];
 
-                    return (
-                        <div 
-                            id={m.name} 
-                            key={m.name}
-                            onClick={() => pendingTransaction ? setShowOptions(showOptions === index ? null : index) : null}
-                            style={{
-                                position: 'absolute', left: `${x}px`, top: `${y}px`,
-                                width: '120px', height: '120px',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                borderRadius: '50%', border: `3px solid ${colors[index % colors.length]}`,
-                                background: '#f9f9f9', fontWeight: 'bold', color: colors[index % colors.length],
-                                cursor: pendingTransaction ? 'pointer' : 'default',
-                                zIndex: 10
-                            }}
-                            className='small-box-shadow'
-                        >
-                            <div className='relative w-full flex flex-col items-center'>
-                                {/* POPUP OPTIONS */}
-                                {showOptions === index && (
-                                    <div className="options-popup absolute -top-24 flex flex-col gap-2 z-50">
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); handleAsk(pendingTransaction); }}
-                                            className="bg-blue-500 text-white text-[10px] px-3 py-2 rounded-full shadow-lg whitespace-nowrap"
-                                        >
-                                            📩 Ask Money
-                                        </button>
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); handleSettle(pendingTransactionIdx); }}
-                                            className="bg-green-600 text-white text-[10px] px-3 py-2 rounded-full shadow-lg whitespace-nowrap"
-                                        >
-                                            ✅ Settle Now
-                                        </button>
-                                    </div>
-                                )}
+    return (
+        <div 
+            id={m.name} 
+            key={m.name}
+            onClick={() => pendingTransaction ? setShowOptions(showOptions === index ? null : index) : null}
+            style={{
+                position: 'absolute', 
+                left: `${x}px`, 
+                top: `${y}px`,
+                width: '120px', 
+                height: '120px',
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                borderRadius: '50%', 
+                border: `3px solid ${colors[index % colors.length]}`,
+                background: '#f9f9f9', 
+                fontWeight: 'bold', 
+                color: colors[index % colors.length],
+                cursor: pendingTransaction ? 'pointer' : 'default',
+                zIndex: 20,
+                // Ensure the container doesn't hide the popup
+                overflow: 'visible' 
+            }}
+            className='small-box-shadow'
+        >
+            {/* 1. MOVE POPUP OUTSIDE THE INTERNAL FLEX COLUMN IF NECESSARY */}
+            {showOptions === index && (
+                <div 
+                    className="options-popup" 
+                    style={{
+                        position: 'absolute',
+                        top: '-90px', // Adjusted to be clearly visible
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                        zIndex: 999, // Super high z-index
+                        pointerEvents: 'auto' // Make sure buttons are clickable
+                    }}
+                >
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); handleAsk(pendingTransaction); }}
+                        className="bg-blue-500 text-white text-[11px] px-4 py-2 rounded-full shadow-xl whitespace-nowrap hover:scale-105 transition-transform"
+                    >
+                        📩 Ask Money
+                    </button>
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); handleSettle(pendingTransactionIdx); }}
+                        className="bg-green-600 text-white text-[11px] px-4 py-2 rounded-full shadow-xl whitespace-nowrap hover:scale-105 transition-transform"
+                    >
+                        ✅ Settle Now
+                    </button>
+                </div>
+            )}
 
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
-                                    {m.name.charAt(0).toUpperCase()}
-                                </div>
-                                <span className="text-xs mt-1">{m.name}</span>
-                            </div>
-                        </div>
-                    );
-                })}
-
+            <div className='flex flex-col items-center justify-center'>
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mb-1">
+                    {m.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-xs">{m.name}</span>
+            </div>
+        </div>
+    );
+})}
                 {transactions.map((item, index) => (
                     <Xarrow
                         key={index}

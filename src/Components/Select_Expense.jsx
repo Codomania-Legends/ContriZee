@@ -80,8 +80,8 @@ function Select_Expense({ members }) {
                                 }}
                                 className={`w-14 h-14 small-box-shadow rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
                                     selectedMember === m.id 
-                                    ? 'bg-indigo-600 border-indigo-600 text-white scale-110' 
-                                    : 'border-gray-300 text-gray-400 hover:border-indigo-300'
+                                    ? 'pink text-white scale-110' 
+                                    : 'border-gray-300 text-gray-400 '
                                 }`}
                             >
                                 {m.name.charAt(0).toUpperCase()}
@@ -95,7 +95,7 @@ function Select_Expense({ members }) {
             {/* 2. Categories Row */}
             {selectedMember && (
                 <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="flex justify-around items-center bg-gray-50 p-4 rounded-2xl medium-box-shadow">
+                    <div className="flex justify-around items-center pink text p-4 rounded-2xl medium-box-shadow">
                         {Object.keys(categories).map((cat) => (
                             <button 
                                 key={cat}
@@ -106,11 +106,11 @@ function Select_Expense({ members }) {
                                 className="flex items-center gap-2 group"
                             >
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                    selectedCategory === cat ? 'border-indigo-600' : 'border-gray-400'
+                                    selectedCategory === cat ? 'border-emerald-200' : 'border-white'
                                 }`}>
-                                    {selectedCategory === cat && <div className="w-2.5 h-2.5 bg-indigo-600 rounded-full" />}
+                                    {selectedCategory === cat && <div className="w-2.5 h-2.5 bg-emerald-200 rounded-full" />}
                                 </div>
-                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-indigo-600' : 'text-gray-500'}`}>
+                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-emerald-200' : 'text-white'}`}>
                                     {cat}
                                 </span>
                             </button>
@@ -128,14 +128,14 @@ function Select_Expense({ members }) {
                             onClick={() => setSelectedSub(item)}
                             className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all small-box-shadow ${
                                 selectedSub === item 
-                                ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
+                                ? 'border-emerald-200 pink text-emerald-200' 
                                 : 'border-gray-100 bg-white text-gray-500'
                             }`}
                         >
                             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                selectedSub === item ? 'border-indigo-600' : 'border-gray-300'
+                                selectedSub === item ? 'border-emerald-200' : 'border-gray-300'
                             }`}>
-                                {selectedSub === item && <div className="w-2 h-2 bg-indigo-600 rounded-full" />}
+                                {selectedSub === item && <div className="w-2 h-2 bg-emerald-200 rounded-full" />}
                             </div>
                             <span className="text-sm font-semibold">{item}</span>
                         </button>
@@ -145,11 +145,11 @@ function Select_Expense({ members }) {
 
             {/* 4. Amount & Save Section */}
             {selectedSub && (
-                <div className="mt-6 p-6 bg-indigo-900 medium-box-shadow rounded-[2.5rem] text-white shadow-xl animate-in slide-in-from-bottom-6 transition-all">
+                <div className="mt-6 p-6 medium-box-shadow rounded-[2.5rem] text-white shadow-xl animate-in slide-in-from-bottom-6 transition-all">
                     
                     {/* Header with Multi-Currency Selector */}
                     <div className="flex justify-between items-center mb-6">
-                        <p className="text-indigo-200 text-[10px] uppercase font-bold tracking-widest">
+                        <p className="text-[#8f577c] text-[10px] uppercase font-bold tracking-widest">
                             Amount for {selectedSub}
                         </p>
                         <div className="flex bg-white/10 p-1 rounded-xl gap-1">
@@ -161,18 +161,18 @@ function Select_Expense({ members }) {
                                         // We don't reset amount so users can see the conversion immediately
                                     }}
                                     className={`px-2 py-1 rounded-lg text-[10px] font-black transition-all ${
-                                        currency === code ? 'bg-white text-indigo-900' : 'text-indigo-300 hover:text-white'
+                                        currency === code ? 'bg-white text-[#e7b9d8]' : 'text-[#8f577c] hover:text-white'
                                     }`}
                                 >
                                     {code}
-                                </button>
+                            </button>
                             ))}
                         </div>
                     </div>
 
                     {/* Input Area */}
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-4xl font-black text-indigo-400">
+                        <span className="text-4xl font-black text-[#8f577c]">
                             {getSymbol(currency)}
                         </span>
                         <input 
@@ -181,7 +181,7 @@ function Select_Expense({ members }) {
                             value={convertedAmount}
                             onChange={(e) => setConvertedAmount(e.target.value)}
                             placeholder="0.00" 
-                            className="bg-transparent text-5xl font-black outline-none w-full placeholder:text-indigo-800"
+                            className="bg-transparent text-5xl font-black outline-none w-full text-[#C599B6]"
                             autoFocus
                         />
                     </div>
@@ -206,7 +206,7 @@ function Select_Expense({ members }) {
                             handleAddExpense(finalInrValue);
                         }}
                         className={`w-full small-box-shadow py-4 rounded-2xl font-black text-lg active:scale-95 transition-all ${
-                            convertedAmount > 0 ? 'bg-white text-indigo-900' : 'bg-indigo-800 text-indigo-600'
+                            convertedAmount > 0 ? 'darkpink text-white' : 'bg-indigo-800 text-indigo-600'
                         }`}
                     >
                         {convertedAmount > 0 ? "CONFIRM & ADD" : "ENTER AMOUNT"}
@@ -218,7 +218,7 @@ function Select_Expense({ members }) {
                 <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto">
                     <button 
                         onClick={() => navigate('/expense-summary', { state: { expenses, members } })}
-                        className="w-full bg-black text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl"
+                        className="w-full black small-box-shadow text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl"
                     >
                         <span>View {expenses.length} Expenses</span>
                         <span>→</span>

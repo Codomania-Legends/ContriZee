@@ -35,11 +35,11 @@ function Add_Members({ members, setMembers }) {
                         onChange={(e) => setTempName(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && addMember()}
                         placeholder="Enter friend's name..."
-                        className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:pink outline-none"
                     />
                     <button 
                         onClick={addMember} 
-                        className="small-box-shadow bg-blue-600 text-white px-4 py-2 rounded-lg font-bold active:scale-90 transition-transform"
+                        className="small-box-shadow pink text-white px-4 py-2 rounded-lg font-bold active:scale-90 transition-transform"
                     >
                         Add
                     </button>
@@ -80,8 +80,8 @@ function Add_Members({ members, setMembers }) {
                         to={canGoNext ? "/select-expense" : "#"} 
                         className={`w-full flex items-center justify-center py-4 rounded-2xl font-bold transition-all duration-500 small-box-shadow ${
                             canGoNext 
-                            ? 'bg-green-600 text-white scale-100 animate-bounce-short' 
-                            : 'bg-gray-100 text-gray-400 cursor-not-allowed scale-95 opacity-70'
+                            ? 'green text-white scale-100 animate-bounce-short' 
+                            : 'pink text-white cursor-pointer scale-95 opacity-70'
                         }`}
                         onClick={(e) => !canGoNext && e.preventDefault()} // Block click if not ready
                     >

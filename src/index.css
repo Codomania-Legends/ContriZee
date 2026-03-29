@@ -27,7 +27,6 @@ body {
   z-index: -1;
 }
 
-input,
 button,
 textarea,
 select {
@@ -36,8 +35,8 @@ select {
 }
 
 .big-box-shadow {
+    transition-duration: 0.5s;
     overflow-x: hidden;
-    transition: all 0.3s ease-in-out;
     background-color: var(--boxColor);
     box-shadow:
         35px 35px 68px rgba(58, 62, 108, 0.5),
@@ -46,7 +45,7 @@ select {
 }
 
 .medium-box-shadow {
-  transition: all 0.3s ease-in-out;
+    transition-duration: 0.5s;
     background-color: var(--boxColor);
     box-shadow:
         20px 20px 40px rgba(58, 62, 108, 0.5), 
@@ -60,19 +59,29 @@ select {
     scale: 0.9;
 }
 .small-box-shadow {
+    transition-duration: 0.5s;
     overflow-x: hidden;
     background-color: var(--boxColor);
     box-shadow:
         10px 10px 20px rgba(58, 62, 108, 0.5),
         inset 0 5px 10px rgba(255, 255, 255, 0.5),
         inset -10px -10px 20px rgba(58, 62, 108, 0.6);
-        transition: all 0.3s ease-in-out;
 }
 
+.lightpink{ --boxColor: #e7b9d8; }
 .pink{ --boxColor: #C599B6; }
+.darkpink{ --boxColor: #9e6a8d; }
 .white{ --boxColor: #FFFFFF; }
 .black{ --boxColor: #000000; }
-
+.green{ --boxColor: #1dc63f; }
+.blue{ --boxColor: #54c56c ; }
+.small-box-shadow {
+  box-shadow:
+    10px 10px 25px #00000050,
+    inset -5px -5px 10px #00000050,
+    inset 0px 5px 10px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
 
 .small-box-shadow:hover {
   box-shadow:
@@ -87,6 +96,13 @@ select {
   transition: all 0.1s ease-in-out;
 }
 
+.medium-box-shadow {
+  box-shadow:
+    20px 20px 40px #00000050,
+    inset -10px -10px 20px #00000050,
+    inset 0px 10px 20px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
 
 .medium-box-shadow:hover {
   box-shadow:
@@ -99,6 +115,14 @@ select {
 .medium-box-shadow:active {
   scale: 0.95;
   transition: all 0.1s ease-in-out;
+}
+
+.large-box-shadow {
+  box-shadow:
+    35px 35px 68px #00000050,
+    inset -12px -12px 30px #00000050,
+    inset 0px 12px 30px #ffffff50;
+  transition: all 0.3s ease-in-out;
 }
 
 .large-box-shadow:hover {
@@ -114,7 +138,6 @@ select {
   transition: all 0.1s ease-in-out;
 }
 
-input,
 button {
   outline: none;
   border: none;

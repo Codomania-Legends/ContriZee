@@ -64,7 +64,7 @@ function Select_Expense({ members }) {
         <div className="max-w-md mx-auto p-6 min-h-screen">
             
             {/* 1. Team Members Row */}
-            <div className="mb-10 text-center">
+            <div className="mb-8 text-center">
                 <h3 className="text-gray-500 text-xs font-bold mb-4 tracking-widest uppercase">1. Who Paid?</h3>
                 <div className="flex justify-center gap-6">
                     {members.map((m) => (

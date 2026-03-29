@@ -34,7 +34,7 @@ function Login({usernames}) {
             <div className='w-[60%] h-full flex justify-center items-center'>
                 <img src="/BGlogin.svg" alt="background" className='h-full -scale-x-100'/>
                 <h1 className='absolute right-[25%] top-[30%] text-3xl font-bold'>Welcome to </h1>
-                <h1 className='absolute right-[25%] top-[35%] text-4xl font-bold font-["Syne"] font-extrabold'>ContriZee</h1>
+                <h1 className='absolute right-[25%] top-[35%] text-4xl font-["Syne"] font-extrabold'>ContriZee</h1>
             </div>
         </div>
     )

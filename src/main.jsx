@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
@@ -30,6 +30,8 @@ const Root = () => {
         <Route path="/select-expense" element={<Select_Expense members={members} />} />
         <Route path="/expense-summary" element={<Expense_Summary members={members} />} />
         <Route path="/settle-debts" element={<Settlement members={members} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </BrowserRouter>
   );

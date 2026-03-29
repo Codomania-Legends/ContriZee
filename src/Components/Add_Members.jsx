@@ -39,7 +39,7 @@ function Add_Members({ members, setMembers }) {
                     />
                     <button 
                         onClick={addMember} 
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold active:scale-90 transition-transform"
+                        className="small-box-shadow bg-blue-600 text-white px-4 py-2 rounded-lg font-bold active:scale-90 transition-transform"
                     >
                         Add
                     </button>
@@ -51,7 +51,7 @@ function Add_Members({ members, setMembers }) {
                         members.map((m) => (
                             <div 
                                 key={m.id} 
-                                className="flex items-center bg-gray-100 text-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 transition-all active:scale-95 animate-in fade-in zoom-in-90"
+                                className="small-box-shadow outline-0 flex items-center bg-gray-100 text-gray-800 px-3 py-1.5 rounded-lg transition-all active:scale-95 animate-in fade-in zoom-in-90"
                             >
                                 <span className="text-sm font-medium">{m.name}</span>
                                 <button 
@@ -78,9 +78,9 @@ function Add_Members({ members, setMembers }) {
                 <div className="max-w-md mx-auto">
                     <Link 
                         to={canGoNext ? "/select-expense" : "#"} 
-                        className={`w-full flex items-center justify-center py-4 rounded-2xl font-bold transition-all duration-500 ${
+                        className={`w-full flex items-center justify-center py-4 rounded-2xl font-bold transition-all duration-500 small-box-shadow ${
                             canGoNext 
-                            ? 'bg-green-600 text-white shadow-xl shadow-green-200 scale-100 animate-bounce-short' 
+                            ? 'bg-green-600 text-white scale-100 animate-bounce-short' 
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed scale-95 opacity-70'
                         }`}
                         onClick={(e) => !canGoNext && e.preventDefault()} // Block click if not ready

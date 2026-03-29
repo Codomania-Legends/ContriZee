@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router';
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router';
 
 function Select_Expense({ members }) {
     const navigate = useNavigate();
-    
+    const location = useLocation();
+
     // Selection States
     const [selectedMember, setSelectedMember] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -29,6 +30,8 @@ function Select_Expense({ members }) {
     };
     // This state stores all confirmed payments
     const [expenses, setExpenses] = useState([]);
+
+    useEffect( () => {setExpenses(location.state?.expenses.length > 0 ? location.state.expenses : [])} , [] )
 
     const categories = {
         Food: { icon: "🍔", items: ["Breakfast", "Lunch", "Dinner", "Snacks", "Drinks", "Water Bottle", "Other"] },
@@ -75,9 +78,9 @@ function Select_Expense({ members }) {
                                     setSelectedCategory(null);
                                     setSelectedSub(null);
                                 }}
-                                className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
+                                className={`w-14 h-14 small-box-shadow rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
                                     selectedMember === m.id 
-                                    ? 'bg-indigo-600 border-indigo-600 text-white scale-110 shadow-lg' 
+                                    ? 'bg-indigo-600 border-indigo-600 text-white scale-110' 
                                     : 'border-gray-300 text-gray-400 hover:border-indigo-300'
                                 }`}
                             >
@@ -92,7 +95,7 @@ function Select_Expense({ members }) {
             {/* 2. Categories Row */}
             {selectedMember && (
                 <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="flex justify-around items-center bg-gray-50 p-4 rounded-2xl">
+                    <div className="flex justify-around items-center bg-gray-50 p-4 rounded-2xl medium-box-shadow">
                         {Object.keys(categories).map((cat) => (
                             <button 
                                 key={cat}
@@ -123,7 +126,7 @@ function Select_Expense({ members }) {
                         <button 
                             key={item}
                             onClick={() => setSelectedSub(item)}
-                            className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                            className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all small-box-shadow ${
                                 selectedSub === item 
                                 ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
                                 : 'border-gray-100 bg-white text-gray-500'
@@ -142,7 +145,7 @@ function Select_Expense({ members }) {
 
             {/* 4. Amount & Save Section */}
             {selectedSub && (
-                <div className="mt-6 p-6 bg-indigo-900 rounded-[2.5rem] text-white shadow-xl animate-in slide-in-from-bottom-6 transition-all">
+                <div className="mt-6 p-6 bg-indigo-900 medium-box-shadow rounded-[2.5rem] text-white shadow-xl animate-in slide-in-from-bottom-6 transition-all">
                     
                     {/* Header with Multi-Currency Selector */}
                     <div className="flex justify-between items-center mb-6">
@@ -202,7 +205,7 @@ function Select_Expense({ members }) {
                             const finalInrValue = parseFloat(convertedAmount) * rates[currency];
                             handleAddExpense(finalInrValue);
                         }}
-                        className={`w-full py-4 rounded-2xl font-black text-lg shadow-lg active:scale-95 transition-all ${
+                        className={`w-full small-box-shadow py-4 rounded-2xl font-black text-lg active:scale-95 transition-all ${
                             convertedAmount > 0 ? 'bg-white text-indigo-900' : 'bg-indigo-800 text-indigo-600'
                         }`}
                     >

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { splitExpenses } from '../Utility/Algo';
 import { useLocation, useNavigate } from 'react-router';
-import Xarrow from 'react-xarrows'; // Ensure this is installed: npm install react-xarrows
+import Xarrow from 'react-xarrows'; 
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
-const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"]; // Add more colors if needed
+const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"];
 
 function Settlement({ members }) {
     const [transactions, setTransactions] = useState([]);
+    const [showOptions, setShowOptions] = useState(null); // Track which member is clicked
     const location = useLocation();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const expenses = location?.state?.expenses || [];
+
+    const exportFormat = "Quick ContriZee update: Hey [Payee], you're down [Amount] for the latest bill. 💸 Hit me up when you've sent it so I can mark it settled! 📱⚡";
 
     useEffect(() => {
         const Details = {
@@ -20,138 +25,139 @@ function Settlement({ members }) {
         setTransactions(result.transactions);
     }, [members, expenses]);
 
-    // Position members in a circle
-    const radius = 250; // Radius of the circle
-    const center = { x: 300, y: 300 }; // Center of the container
+    // Animation for the popup buttons
+    useGSAP(() => {
+        if (showOptions !== null) {
+            gsap.fromTo(".options-popup", { opacity: 0, scale: 0.8, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(1.7)" });
+        }
+    }, [showOptions]);
+
+    const handleSettle = (index) => {
+        const newTransactions = [...transactions];
+        // Remove the transaction from the list
+        newTransactions.splice(index, 1);
+        setTransactions(newTransactions);
+        setShowOptions(null);
+        alert("Transaction marked as Settled! ✅");
+    };
+
+    const handleAsk = (item) => {
+        const text = exportFormat.replace("[Payee]", item.from).replace("[Amount]", item.amount.toFixed(2));
+        navigator.clipboard.writeText(text);
+        alert(`Request copied for ${item.from}! 📋`);
+        setShowOptions(null);
+    };
+
+    const radius = 250; 
+    const center = { x: 300, y: 300 }; 
 
     return (
         <div style={{ padding: '40px', fontFamily: 'sans-serif', position: 'relative' }}>
             <h2 style={{ textAlign: 'center' }}>Settlement Plan 💸</h2>
 
-            {/* Container with specified width and height to anchor the circular layout */}
             <div style={{ position: 'relative', width: '600px', height: '600px', margin: '0 auto', zIndex: 1 }}>
                 
-                {/* 1. Member Nodes: Positioned in a circle ⭕ */}
                 {members.map((m, index) => {
-                    // Calculate angle for each member based on its index
                     const angle = (index / members.length) * 2 * Math.PI;
-                    
-                    // Convert polar to cartesian coordinates
-                    const x = center.x + radius * Math.cos(angle) - 60; // Adjust for node width/2
-                    const y = center.y + radius * Math.sin(angle) - 60; // Adjust for node height/2
+                    const x = center.x + radius * Math.cos(angle) - 60;
+                    const y = center.y + radius * Math.sin(angle) - 60;
+
+                    // Check if this person has to pay someone
+                    const pendingTransactionIdx = transactions.findIndex(t => t.from === m.name);
+                    const pendingTransaction = transactions[pendingTransactionIdx];
 
                     return (
                         <div 
-                            id={m.name} // The ID used by Xarrow
+                            id={m.name} 
                             key={m.name}
+                            onClick={() => pendingTransaction ? setShowOptions(showOptions === index ? null : index) : null}
                             style={{
-                                position: 'absolute',
-                                left: `${x}px`,
-                                top: `${y}px`,
-                                padding: '15px',
-                                width: '120px',
-                                height: '120px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: '50%', // Circular Node
-                                border: `3px solid ${colors[index % colors.length]}`,
-                                background: '#f9f9f9',
-                                textAlign: 'center',
-                                fontWeight: 'bold',
-                                color: colors[index % colors.length],
-                                fontSize: '1.1rem',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                                zIndex: 2
+                                position: 'absolute', left: `${x}px`, top: `${y}px`,
+                                width: '120px', height: '120px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                borderRadius: '50%', border: `3px solid ${colors[index % colors.length]}`,
+                                background: '#f9f9f9', fontWeight: 'bold', color: colors[index % colors.length],
+                                cursor: pendingTransaction ? 'pointer' : 'default',
+                                zIndex: 10
                             }}
+                            className='small-box-shadow'
                         >
-                            {m.name}
+                            <div className='relative w-full flex flex-col items-center'>
+                                {/* POPUP OPTIONS */}
+                                {showOptions === index && (
+                                    <div className="options-popup absolute -top-24 flex flex-col gap-2 z-50">
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); handleAsk(pendingTransaction); }}
+                                            className="bg-blue-500 text-white text-[10px] px-3 py-2 rounded-full shadow-lg whitespace-nowrap"
+                                        >
+                                            📩 Ask Money
+                                        </button>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); handleSettle(pendingTransactionIdx); }}
+                                            className="bg-green-600 text-white text-[10px] px-3 py-2 rounded-full shadow-lg whitespace-nowrap"
+                                        >
+                                            ✅ Settle Now
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                                    {m.name.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="text-xs mt-1">{m.name}</span>
+                            </div>
                         </div>
                     );
                 })}
 
-                {/* 2. Arrows: Curved arrows for every transaction 〰️ */}
-                {transactions.map((item, index) => {
-                    const amountText = `$${item.amount.toFixed(2)}`;
-                    
-                    return (
-                        <Xarrow
-                            key={index}
-                            start={item.from} // ID of the debtor
-                            end={item.to}     // ID of the creditor
-                            path="smooth"     // 🗝️ Makes the arrow curvy!
-                            curviness={0.5}   // Adjust curviness (0 to 1)
-                            breakpoint={0.5}  // Adjust curve starting point
-                            color="#e0e0e0"   // Use a light color as default
-                            strokeWidth={1.5}
-                            dashness={{ 
-                                strokeLen: 8, 
-                                nonStrokeLen: 12, 
-                                animation: true 
-                            }} // Static dashness for all, animation is fun
-                            labels={{ 
-                                middle: <div style={{ 
-                                    background: 'white', 
-                                    padding: '4px 10px', 
-                                    borderRadius: '15px', 
-                                    border: '1px solid green',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 'bold',
-                                    color: 'green',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}>
-                                    <span>${item.amount.toFixed(2)}</span>
-                                    {/* Add a little animation to the amount */}
-                                    <span className="pulse"></span>
-                                </div> 
-                            }}
-                            headSize={6}
-                        />
-                    );
-                })}
-            </div>
-
-            {/* 3. Text Fallback & Pulse animation */}
-            <div style={{ marginTop: '100px', background: '#eee', padding: '15px', borderRadius: '8px' }}>
-                <h3>Summary List</h3>
-                {transactions.length === 0 && <p>All settled! ✅</p>}
-                {transactions.map((item, idx) => (
-                    <p key={idx}>⮕ {item.from} sends ${item.amount.toFixed(2)} to {item.to}</p>
+                {transactions.map((item, index) => (
+                    <Xarrow
+                        key={index}
+                        start={item.from}
+                        end={item.to}
+                        path="smooth"
+                        curviness={0.5}
+                        color="#4ade80" 
+                        strokeWidth={2}
+                        dashness={{ strokeLen: 8, nonStrokeLen: 6, animation: true }}
+                        labels={{ 
+                            middle: (
+                                <div className="bg-white px-3 py-1 rounded-full border border-green-500 text-sm font-bold text-green-700 shadow-sm">
+                                    ${item.amount.toFixed(2)}
+                                </div>
+                            ) 
+                        }}
+                        headSize={5}
+                    />
                 ))}
             </div>
 
-            {/* Add pulse animation via style tag to keep it in one file */}
+            {/* Summary List */}
+            <div style={{ marginTop: '50px', background: '#f4f4f4', padding: '20px', borderRadius: '15px' }}>
+                <h3 className="font-bold mb-3">Active Debts 📋</h3>
+                {transactions.length === 0 ? (
+                    <p className="text-green-600 font-medium">Everyone is square! No debts found. ✨</p>
+                ) : (
+                    transactions.map((item, idx) => (
+                        <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
+                            <span><b>{item.from}</b> owes <b>{item.to}</b>: ${item.amount.toFixed(2)}</span>
+                            <button 
+                                onClick={() => handleSettle(idx)}
+                                className="text-xs bg-white border border-green-500 text-green-600 px-2 py-1 rounded-md hover:bg-green-50"
+                            >
+                                Settle
+                            </button>
+                        </div>
+                    ))
+                )}
+            </div>
+
             <style>
                 {`
-                    @keyframes pulse {
-                        0% { transform: scale(1); opacity: 1; }
-                        50% { transform: scale(1.1); opacity: 0.7; }
-                        100% { transform: scale(1); opacity: 1; }
-                    }
-                    .pulse {
-                        display: inline-block;
-                        width: 8px;
-                        height: 8px;
-                        border-radius: 50%;
-                        background: lightgreen;
-                        animation: pulse 1.5s infinite;
-                    }
+                    .small-box-shadow { box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+                    .small-box-shadow:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
                 `}
             </style>
-            {expenses.length > 0 && (
-                <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto">
-                    <button 
-                        onClick={() => navigate('/expense-summary', { state: { expenses } })}
-                        className="w-full bg-black text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl"
-                    >
-                        <span>View {expenses.length} Expenses</span>
-                        <span>→</span>
-                    </button>
-                </div>
-            )}
         </div>
     );
 }

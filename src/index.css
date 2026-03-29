@@ -6,10 +6,76 @@
   background-color: #212121;
 }
 
-
-
 body {
   height: 100%;
   width: 100%;
 }
 
+.small-box-shadow {
+  box-shadow:
+    10px 10px 25px #00000050,
+    inset -5px -5px 10px #00000050,
+    inset 0px 5px 10px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
+
+.small-box-shadow:hover {
+  box-shadow:
+    7px 7px 20px #00000050,
+    inset -7px -7px 15px #00000050,
+    inset 0px 7px 15px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
+
+.small-box-shadow:active {
+  scale: 0.95;
+  transition: all 0.1s ease-in-out;
+}
+
+.medium-box-shadow {
+  box-shadow:
+    20px 20px 40px #00000050,
+    inset -10px -10px 20px #00000050,
+    inset 0px 10px 20px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
+
+.medium-box-shadow:hover {
+  box-shadow:
+    15px 15px 28px #00000050,
+    inset -15px -15px 30px #00000050,
+    inset 0px 15px 30px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
+
+.medium-box-shadow:active {
+  scale: 0.95;
+  transition: all 0.1s ease-in-out;
+}
+
+.large-box-shadow {
+  box-shadow:
+    35px 35px 68px #00000050,
+    inset -12px -12px 30px #00000050,
+    inset 0px 12px 30px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
+
+.large-box-shadow:hover {
+  box-shadow:
+    15px 15px 28px #00000050,
+    inset -15px -15px 30px #00000050,
+    inset 0px 15px 30px #ffffff50;
+  transition: all 0.3s ease-in-out;
+}
+
+.large-box-shadow:active {
+  scale: 0.95;
+  transition: all 0.1s ease-in-out;
+}
+
+input,
+button {
+  outline: none;
+  border: none;
+}

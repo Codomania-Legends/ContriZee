@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router'; // or 'react-router-dom'
 import { ref, set } from 'firebase/database';
 import { db } from '../firebase'; // Bring in your centralized db config! 🔥
 import { useUser } from '../UserContext'; // 🪄 Import Context
+import Cookies from 'js-cookie';
 
 function Signup() {
     const navigate = useNavigate();

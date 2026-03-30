@@ -5,6 +5,7 @@ import Xarrow from 'react-xarrows';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useUser } from '../UserContext'; // 🪄 Import the Context!
+import { sileo } from 'sileo';
 
 const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"];
 
@@ -44,13 +45,13 @@ function Settlement() { // 🧹 Removed 'members' from props
         newTransactions.splice(index, 1);
         setTransactions(newTransactions);
         setShowOptions(null);
-        alert("Transaction marked as Settled! ✅");
+        sileo.useState("Transaction marked as Settled! ✅");
     };
 
     const handleAsk = (item) => {
         const text = exportFormat.replace("[Payee]", item.from).replace("[Amount]", item.amount.toFixed(2));
         navigator.clipboard.writeText(text);
-        alert(`Request copied for ${item.from}! 📋`);
+        sileo.success(`Request copied for ${item.from}! 📋`);
         setShowOptions(null);
     };
 

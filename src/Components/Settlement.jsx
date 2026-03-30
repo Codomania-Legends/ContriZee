@@ -4,24 +4,25 @@ import { useLocation, useNavigate } from 'react-router';
 import Xarrow from 'react-xarrows'; 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useUser } from '../UserContext'; // 🪄 Import the Context!
+import { useUser } from '../UserContext'; 
 import { sileo } from 'sileo';
 
 const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"];
 
-function Settlement() { // 🧹 Removed 'members' from props
-    // 📥 Pull members from global state!
+function Settlement({ openRouter }) { 
+
     const { members, expenses } = useUser();
     
     const [transactions, setTransactions] = useState([]);
-    const [showOptions, setShowOptions] = useState(null); // Track which member is clicked
-    const location = useLocation();
+    const [showOptions, setShowOptions] = useState(null); 
+    const [exportFormat, setExportFormat] = useState("Quick ContriZee update: Hey [Payee], you're down ₹[Amount] for the latest bill. 💸 Hit me up when you've sent it so I can mark it settled! 📱⚡");
     const navigate = useNavigate();
 
-    const exportFormat = "Quick ContriZee update: Hey [Payee], you're down ₹[Amount] for the latest bill. 💸 Hit me up when you've sent it so I can mark it settled! 📱⚡";
+    useEffect( () => {
+        
+    } , [] )
 
     useEffect(() => {
-        // Only run if we actually have members and expenses to avoid crash 🛡️
         if (members.length > 0) {
             const Details = {
                 members: members.map(m => m.name),

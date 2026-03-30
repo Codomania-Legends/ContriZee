@@ -24,7 +24,7 @@ const HomeLayout = () => {
 
 const Layout = ({openRouter}) => {
   const {members, expenses} = useUser()
-  const [advice, setAdvice] = useState("")
+
   return (
   <div className='main-container'>
     <Outlet />

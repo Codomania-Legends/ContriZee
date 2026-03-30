@@ -8,7 +8,7 @@ function Signup() {
     const navigate = useNavigate();
     
     // 1. Pull what you need directly from the Context! 📥
-    const { user, setUser, usernames } = useUser();
+    const { user, setUser, usernames, tripDetails } = useUser();
 
     const [field, setField] = useState({
         username: "",
@@ -17,10 +17,17 @@ function Signup() {
 
     // Automatically send them to the app if they already have an active session! 🔀
     useEffect(() => {
-        if (user) {
-            navigate("/add-members");
+        console.log("user", user);
+        // If the user is already logged in (via Context/Cookie), send them straight in! 🏃‍♂️
+        if(user){
+            console.log("Got TripDetails : ",tripDetails)
+            if(tripDetails?.activeTrip){
+                navigate("/select-expense");
+            }else{
+                navigate("/add-members");
+            }
         }
-    }, [user, navigate]);
+    }, [user, navigate, tripDetails]);
 
     const dataSet = () => {
         // Cleaned up the Firebase 9 modular syntax! 🧹
@@ -43,7 +50,8 @@ function Signup() {
             dataSet(); 
             setUser(field.username);
             // Added path=/ so the cookie is valid across all routes! 🍪
-            document.cookie = `username=${field.username}; path=/; max-age=86400`; 
+            // document.cookie = `username=${field.username}; path=/; max-age=86400`; 
+            Cookies.set("username", field.username, { expires: 7 });
             navigate("/add-members");
         }
     }

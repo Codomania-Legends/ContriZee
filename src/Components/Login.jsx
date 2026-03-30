@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router'; // or 'react-router-dom' depending on your setup
 import { useUser } from '../UserContext'; // Make sure this path matches where you saved UserContext.jsx
+import Cookies from 'js-cookie';
 
 function Login() {
     const navigate = useNavigate();
     
     // 1. Pull what you need directly from the Context! 🪄
-    const { user, setUser, usernames } = useUser(); 
+    const { user, setUser, usernames, tripDetails } = useUser(); 
     
     const [field, setField] = useState({
         username: ""
@@ -16,9 +17,14 @@ function Login() {
         console.log("user", user);
         // If the user is already logged in (via Context/Cookie), send them straight in! 🏃‍♂️
         if(user){
-            navigate("/add-members");
+            console.log("Got TripDetails : ",tripDetails)
+            if(tripDetails?.activeTrip){
+                navigate("/select-expenses");
+            }else{
+                navigate("/add-members");
+            }
         }
-    }, [user, navigate]);
+    }, [user, navigate, tripDetails]);
 
     function HandleSubmit(e) {
         e.preventDefault();
@@ -27,7 +33,8 @@ function Login() {
         if (usernames.includes(field.username)) {
             setUser(field.username);
             // FIX: Added path=/ and ensured this runs only on success 🍪
-            document.cookie = `username=${field.username}; path=/; max-age=86400`; 
+            // document.cookie = `username=${field.username}; path=/; max-age=86400`; 
+            Cookies.set("username", field.username, { expires: 7 });
             navigate("/add-members");
         } else {
             alert("No user Found 🤷‍♂️");

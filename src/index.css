@@ -3,6 +3,20 @@
 :root {
   height: 100vh;
   width: 100vw;
+  /* State colors (oklch) */
+  --sileo-state-success: oklch(0.723 0.219 142.136);
+  --sileo-state-loading: oklch(0.556 0 0);
+  --sileo-state-error: oklch(0.637 0.237 25.331);
+  --sileo-state-warning: oklch(0.795 0.184 86.047);
+  --sileo-state-info: oklch(0.685 0.169 237.323);
+  --sileo-state-action: oklch(0.623 0.214 259.815);
+
+  /* Dimensions */
+  --sileo-width: 350px;
+  --sileo-height: 40px;
+
+  /* Animation */
+  --sileo-duration: 600ms;
 }
 
 body {
@@ -35,59 +49,41 @@ select {
 }
 
 .big-box-shadow {
-    transition-duration: 0.5s;
-    overflow-x: hidden;
-    background-color: var(--boxColor);
-    box-shadow:
-        35px 35px 68px rgba(58, 62, 108, 0.5),
-        inset 0 12px 30px rgba(255, 255, 255, 0.5),
-        inset -12px -12px 30px rgba(58, 62, 108, 0.6);
+  transition-duration: 0.5s;
+  overflow-x: hidden;
+  box-shadow:
+    35px 35px 68px rgba(58, 62, 108, 0.5),
+    inset 0 12px 30px rgba(255, 255, 255, 0.5),
+    inset -12px -12px 30px rgba(58, 62, 108, 0.6);
 }
 
 .medium-box-shadow {
-    transition-duration: 0.5s;
-    background-color: var(--boxColor);
-    box-shadow:
-        20px 20px 40px rgba(58, 62, 108, 0.5), 
-        inset 15px 15px 30px rgba(255, 255, 255, 0.5), 
-        inset -20px -20px 30px rgba(58, 62, 108, 0.6)
-}
-.big-box-shadow:hover{
-    scale: 1.02;
-}
-.big-box-shadow:active{
-    scale: 0.9;
-}
-.small-box-shadow {
-    transition-duration: 0.5s;
-    overflow-x: hidden;
-    background-color: var(--boxColor);
-    box-shadow:
-        10px 10px 20px rgba(58, 62, 108, 0.5),
-        inset 0 5px 10px rgba(255, 255, 255, 0.5),
-        inset -10px -10px 20px rgba(58, 62, 108, 0.6);
-}
-
-.lightpink{ --boxColor: #e7b9d8; }
-.pink{ --boxColor: #C599B6; }
-.darkpink{ --boxColor: #9e6a8d; }
-.white{ --boxColor: #FFFFFF; }
-.black{ --boxColor: #000000; }
-.green{ --boxColor: #1dc63f; }
-.blue{ --boxColor: #54c56c ; }
-.small-box-shadow {
+  transition-duration: 0.5s;
   box-shadow:
-    10px 10px 25px #00000050,
-    inset -5px -5px 10px #00000050,
-    inset 0px 5px 10px #ffffff50;
-  transition: all 0.3s ease-in-out;
+    20px 20px 40px rgba(58, 62, 108, 0.5),
+    inset 15px 15px 30px rgba(255, 255, 255, 0.5),
+    inset -20px -20px 30px rgba(58, 62, 108, 0.6);
+}
+.big-box-shadow:hover {
+  scale: 1.02;
+}
+.big-box-shadow:active {
+  scale: 0.9;
+}
+.small-box-shadow {
+  transition-duration: 0.5s;
+  overflow-x: hidden;
+  box-shadow:
+    10px 10px 20px rgba(58, 62, 108, 0.5),
+    inset 0 5px 10px rgba(255, 255, 255, 0.5),
+    inset -10px -10px 20px rgba(58, 62, 108, 0.6);
 }
 
 .small-box-shadow:hover {
   box-shadow:
-    7px 7px 20px #00000050,
-    inset -7px -7px 15px #00000050,
-    inset 0px 7px 15px #ffffff50;
+    7px 7px 20px rgba(58, 62, 108, 0.5),
+    inset 0px 7px 15px rgba(255, 255, 255, 0.5),
+    inset -7px -7px 15px rgba(58, 62, 108, 0.6);
   transition: all 0.3s ease-in-out;
 }
 

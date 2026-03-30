@@ -1,15 +1,26 @@
 import { ref, push, set } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router'; // or 'react-router-dom'
+import { useNavigate } from 'react-router'; 
 import { db } from '../firebase';
-import { useUser } from '../UserContext'; // 🪄 Import Context
+import { useUser } from '../UserContext'; 
+import { sileo } from "sileo";
 
 function Select_Expense() {
     const navigate = useNavigate();
-    const location = useLocation();
 
-    // 1. Pull user and members directly from Context! 📥
-    const { user, members } = useUser();
+    // 1. Pull everything from Context. Note: we use activeTrip from tripDetails! 📥
+    const { user, members, expenses, tripDetails, setTripDetails } = useUser();
+    const activeTrip = tripDetails?.activeTrip;
+    useEffect( () => {
+        if( !activeTrip ){
+            const tripCookie = document.cookie.split(";").find(row => row.trim().startsWith("activeTrip="));
+            setTripDetails({...tripDetails, activeTrip: tripCookie.split("=")[1]})
+            console.log("cookie check -, ",tripCookie.split("=")[1])
+            if( !tripCookie ){
+                navigate(`/add-members`)
+            }
+        }
+    } , [activeTrip] )
 
     // Selection States
     const [selectedMember, setSelectedMember] = useState(null);
@@ -20,28 +31,12 @@ function Select_Expense() {
     const [currency, setCurrency] = useState("INR");
     const [convertedAmount, setConvertedAmount] = useState("");
 
-    // Current approximate rates (Update these as needed) 💱
-    const rates = { 
-        INR: 1, 
-        USD: 94.86, 
-        EUR: 109.01, 
-        GBP: 128.85 
-    };
+    const rates = { INR: 1, USD: 94.86, EUR: 109.01, GBP: 128.85 };
 
-    // Helper to get the correct symbol
     const getSymbol = (code) => {
         const symbols = { INR: "₹", USD: "$", EUR: "€", GBP: "£" };
         return symbols[code] || "₹";
     };
-
-    // This state stores all confirmed payments
-    const [expenses, setExpenses] = useState([]);
-
-    useEffect(() => {
-        // Load existing expenses from state if returning from the summary page 🔙
-        setExpenses(location.state?.expenses?.length > 0 ? location.state.expenses : []);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const categories = {
         Food: { icon: "🍔", items: ["Breakfast", "Lunch", "Dinner", "Snacks", "Drinks", "Water Bottle", "Other"] },
@@ -50,55 +45,61 @@ function Select_Expense() {
     };
 
     const handleAddExpense = (finalInrValue) => {
-        const numericAmount = parseFloat(finalInrValue);
+        // 🛡️ Safety check: Ensure a trip is actually active
+        if (!activeTrip?.firebaseKey) {
+            alert("Please select or create a trip first! 🎒");
+            return;
+        }
 
-        // 1. Validation (Always a good idea to keep this active) 🛡️
+        const numericAmount = parseFloat(finalInrValue);
         if (!selectedMember || !selectedSub || isNaN(numericAmount)) {
-            alert("Please complete all selections and enter a valid amount! 🛑");
+            alert("Please complete all selections! 🛑");
             return;
         }
 
         const payer = members.find(m => m.id === selectedMember);
-
         const newExpense = {
-            id: Date.now(), // Local unique ID
+            id: Date.now(), 
             payerId: selectedMember,
             paidBy: payer ? payer.name : "Unknown",
             category: selectedCategory,
             item: selectedSub,
             amount: numericAmount,
-            // Using IDs for splitAmong is usually safer than names
             splitAmong: members.map(member => member.name) 
         };
 
-        // 2. Update Firebase with a unique key ☁️
-        const expenseListRef = ref(db, `users/${user}/expenses`);
-        const newExpenseRef = push(expenseListRef); // Creates a new unique ID in Firebase
+        // ✅ Correct Path: users/anshul/trips/TRIP_ID/expenses
+        const expenseListRef = ref(db, `users/${user}/trips/${activeTrip.firebaseKey}/expenses`);
+        const newExpenseRef = push(expenseListRef); 
         
-        set(newExpenseRef, newExpense)
-            .then(() => {
-                // 3. Update local state only after successful DB write ✅
-                setExpenses(prev => [...prev, { ...newExpense, firebaseKey: newExpenseRef.key }]);
-                
-                // Reset fields (FIXED: resetting convertedAmount instead of unused 'amount') 🧹
-                setSelectedSub(null);
-                setConvertedAmount(""); 
-                // alert("Expense Added! 🎉"); // Optional: Might be annoying after a while
-            })
-            .catch((error) => {
-                console.error("Data could not be saved." + error);
-                alert("Failed to save expense. Please try again. ⚠️");
-            });
+        sileo.promise(set(newExpenseRef, newExpense), {
+            loading: { title: "Saving expense..." },
+            success: { 
+                title: "Added! 🎉",
+                description: `${payer?.name} paid ₹${numericAmount.toFixed(2)}`
+            },
+            error: { title: "Failed to save ⚠️" },
+        });
+
+        // Reset UI fields
+        setSelectedSub(null);
+        setConvertedAmount("");
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 min-h-screen pb-24"> {/* Added pb-24 so the floating button doesn't cover content! */}
+        <div className="max-w-md mx-auto p-6 min-h-screen pb-32">
             
+            {/* Header: Show which trip we are adding to! 📍 */}
+            <div className="mb-6 text-center">
+                <h2 className="text-xl font-black text-gray-800">{activeTrip?.name || "No Trip Selected"}</h2>
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">Logging Expense</p>
+            </div>
+
             {/* 1. Team Members Row 👤 */}
             <div className="mb-8 text-center">
-                <h3 className="text-gray-500 text-xs font-bold mb-4 tracking-widest uppercase">1. Who Paid?</h3>
-                <div className="flex justify-center gap-6">
-                    {members && members.map((m) => (
+                <h3 className="text-gray-500 text-[10px] font-bold mb-4 tracking-widest uppercase">1. Who Paid?</h3>
+                <div className="flex justify-center gap-4 flex-wrap">
+                    {activeTrip?.members?.map((m) => (
                         <div key={m.id} className="flex flex-col items-center gap-2">
                             <button 
                                 onClick={() => {
@@ -108,13 +109,13 @@ function Select_Expense() {
                                 }}
                                 className={`w-14 h-14 small-box-shadow rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
                                     selectedMember === m.id 
-                                    ? 'pink text-black scale-110' 
-                                    : 'border-gray-300 text-gray-400 '
+                                    ? 'pink text-black scale-110 border-black' 
+                                    : 'bg-white border-gray-200 text-gray-400'
                                 }`}
                             >
                                 {m.name.charAt(0).toUpperCase()}
                             </button>
-                            <span className="text-xs font-medium text-gray-600">{m.name}</span>
+                            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">{m.name}</span>
                         </div>
                     ))}
                 </div>
@@ -123,7 +124,7 @@ function Select_Expense() {
             {/* 2. Categories Row 🏷️ */}
             {selectedMember && (
                 <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="flex justify-around items-center pink text p-4 rounded-2xl medium-box-shadow">
+                    <div className="flex justify-around items-center pink p-4 rounded-2xl medium-box-shadow bg-amber-950 text-white">
                         {Object.keys(categories).map((cat) => (
                             <button 
                                 key={cat}
@@ -138,7 +139,7 @@ function Select_Expense() {
                                 }`}>
                                     {selectedCategory === cat && <div className="w-2.5 h-2.5 bg-emerald-200 rounded-full" />}
                                 </div>
-                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-emerald-200' : 'text-black'}`}>
+                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-emerald-200' : 'text-white'}`}>
                                     {cat}
                                 </span>
                             </button>
@@ -156,15 +157,10 @@ function Select_Expense() {
                             onClick={() => setSelectedSub(item)}
                             className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all small-box-shadow ${
                                 selectedSub === item 
-                                ? 'border-emerald-200 pink text-emerald-200' 
+                                ? 'border-red-900 text-red-900 bg-red-300' 
                                 : 'border-gray-100 bg-white text-gray-500'
                             }`}
                         >
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                selectedSub === item ? 'border-emerald-200' : 'border-gray-300'
-                            }`}>
-                                {selectedSub === item && <div className="w-2 h-2 bg-emerald-200 rounded-full" />}
-                            </div>
                             <span className="text-sm font-semibold">{item}</span>
                         </button>
                     ))}
@@ -174,19 +170,15 @@ function Select_Expense() {
             {/* 4. Amount & Save Section 💰 */}
             {selectedSub && (
                 <div className="mt-6 p-6 medium-box-shadow rounded-[2.5rem] text-black shadow-xl animate-in slide-in-from-bottom-6 transition-all">
-                    
-                    {/* Header with Multi-Currency Selector */}
                     <div className="flex justify-between items-center mb-6">
-                        <p className="text-[#8f577c] text-[10px] uppercase font-bold tracking-widest">
-                            Amount for {selectedSub}
-                        </p>
+                        <p className="text-[#8f577c] text-[10px] uppercase font-bold tracking-widest">Amount for {selectedSub}</p>
                         <div className="flex bg-white/10 p-1 rounded-xl gap-1">
                             {Object.keys(rates).map((code) => (
                                 <button 
                                     key={code}
                                     onClick={() => setCurrency(code)}
                                     className={`px-2 py-1 rounded-lg text-[10px] font-black transition-all ${
-                                        currency === code ? 'bg-white text-[#e7b9d8]' : 'text-[#8f577c] hover:text-black'
+                                        currency === code ? 'bg-white text-[#e7b9d8]' : 'text-[#8f577c]'
                                     }`}
                                 >
                                     {code}
@@ -195,11 +187,8 @@ function Select_Expense() {
                         </div>
                     </div>
 
-                    {/* Input Area */}
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-4xl font-black text-[#8f577c]">
-                            {getSymbol(currency)}
-                        </span>
+                        <span className="text-4xl font-black text-[#8f577c]">{getSymbol(currency)}</span>
                         <input 
                             type="number" 
                             inputMode="decimal"
@@ -211,13 +200,11 @@ function Select_Expense() {
                         />
                     </div>
 
-                    {/* --- LIVE INR PREVIEW FOR ALL NON-INR CURRENCIES --- */}
                     <div className="h-8 mb-6">
                         {convertedAmount > 0 && currency !== "INR" && (
-                            <div className="flex items-center gap-2 text-green-400 animate-in fade-in slide-in-from-left-2">
-                                <span className="text-[10px] font-bold uppercase tracking-tighter opacity-70">Approx.</span>
+                            <div className="flex items-center gap-2 text-green-500 animate-in fade-in slide-in-from-left-2">
                                 <span className="text-lg font-black italic">
-                                    ₹{(convertedAmount * rates[currency]).toLocaleString('en-IN', { maximumFractionDigits: 2 })} INR
+                                    ≈ ₹{(convertedAmount * rates[currency]).toFixed(2)} INR
                                 </span>
                             </div>
                         )}
@@ -225,16 +212,12 @@ function Select_Expense() {
 
                     <button 
                         disabled={!convertedAmount || convertedAmount <= 0}
-                        onClick={() => {
-                            // Calculate final INR value based on the selected currency's rate
-                            const finalInrValue = parseFloat(convertedAmount) * rates[currency];
-                            handleAddExpense(finalInrValue);
-                        }}
-                        className={`w-full small-box-shadow py-4 rounded-2xl font-black text-lg active:scale-95 transition-all ${
-                            convertedAmount > 0 ? 'darkpink text-black' : 'bg-indigo-800 text-indigo-600'
+                        onClick={() => handleAddExpense(parseFloat(convertedAmount) * rates[currency])}
+                        className={`w-full py-4 rounded-2xl font-black text-lg active:scale-95 transition-all small-box-shadow ${
+                            convertedAmount > 0 ? 'bg-red-900 text-white' : 'bg-gray-200 text-gray-400'
                         }`}
                     >
-                        {convertedAmount > 0 ? "CONFIRM & ADD" : "ENTER AMOUNT"}
+                        CONFIRM & ADD
                     </button>
                 </div>
             )}
@@ -243,9 +226,8 @@ function Select_Expense() {
             {expenses.length > 0 && (
                 <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto z-50">
                     <button 
-                        // Note: We don't need to pass 'members' in state anymore because it's in Context!
-                        onClick={() => navigate('/expense-summary', { state: { expenses } })}
-                        className="w-full black small-box-shadow text-black py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl active:scale-95 transition-transform"
+                        onClick={() => navigate('/expense-summary')}
+                        className="w-full bg-black text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl active:scale-95 transition-transform"
                     >
                         <span>View {expenses.length} Expenses</span>
                         <span>→</span>

@@ -10,13 +10,12 @@ const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"];
 
 function Settlement() { // 🧹 Removed 'members' from props
     // 📥 Pull members from global state!
-    const { members } = useUser();
+    const { members, expenses } = useUser();
     
     const [transactions, setTransactions] = useState([]);
     const [showOptions, setShowOptions] = useState(null); // Track which member is clicked
     const location = useLocation();
     const navigate = useNavigate();
-    const expenses = location?.state?.expenses || [];
 
     const exportFormat = "Quick ContriZee update: Hey [Payee], you're down ₹[Amount] for the latest bill. 💸 Hit me up when you've sent it so I can mark it settled! 📱⚡";
 
@@ -158,11 +157,13 @@ function Settlement() { // 🧹 Removed 'members' from props
                         curviness={0.5}
                         color="#4ade80" 
                         strokeWidth={2}
+                        breakpoint={0.5}
                         dashness={{ strokeLen: 8, nonStrokeLen: 6, animation: true }}
                         labels={{ 
                             middle: (
                                 <div className="bg-white px-3 py-1 rounded-full border border-green-500 text-sm font-bold text-green-700 shadow-sm">
                                     ₹{item.amount.toFixed(2)}
+                                    <span className="pulse"></span>
                                 </div>
                             ) 
                         }}
@@ -195,6 +196,19 @@ function Settlement() { // 🧹 Removed 'members' from props
                 {`
                     .small-box-shadow { box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; }
                     .small-box-shadow:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+                    @keyframes pulse {
+                        0% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(1.1); opacity: 0.7; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                    .pulse {
+                        display: inline-block;
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        background: lightgreen;
+                        animation: pulse 1.5s infinite;
+                    }
                 `}
             </style>
         </div>

@@ -1,69 +1,110 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ref, get, child, onValue } from 'firebase/database';
 import { db } from './firebase.js';
+import { sileo } from 'sileo'; 
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [usernames, setUsernames] = useState([]);
   const [user, setUser] = useState(null);
-  
-  // These will now be synced directly with Firebase! ☁️
   const [members, setMembers] = useState([]);
-  const [expenses, setExpenses] = useState([]); // 👈 NEW: Global Expenses State!
+  const [expenses, setExpenses] = useState([]);
+  // Changed currentTrip to activeTrip for better object handling
+  const [tripDetails, setTripDetails] = useState({ allTrips: [], activeTrip: null });
+  const [loading, setLoading] = useState(true); 
 
-  // 1. Fetch Usernames & Check Cookies on Load 🍪
   useEffect(() => {
     const cookies = document.cookie.split(";");
     const userCookie = cookies.find(row => row.trim().startsWith("username="));
+    const tripCookie = cookies.find(row => row.trim().startsWith("activeTrip="));
     
     if (userCookie) {
         setUser(userCookie.split("=")[1]);
     }
+    if(tripCookie){
+        setTripDetails(prev => ({ ...prev, activeTrip: tripCookie.split("=")[1] }));
+    }
 
-    get(child(ref(db), `users`))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          setUsernames(Object.keys(snapshot.val())); 
-        }
-      })
-      .catch((error) => console.error("Firebase Error:", error));
+    const fetchUsernames = async () => {
+      const snapshot = await get(child(ref(db), `users`));
+      if (snapshot.exists()) {
+        setUsernames(Object.keys(snapshot.val()));
+      }
+      return snapshot;
+    };
+
+    sileo.promise(fetchUsernames(), {
+      loading: { title: "Fetching users..." },
+      success: { title: "Users loaded!" },
+      error: { title: "Failed to load users" },
+    }); 
   }, []);
 
-  // 2. Real-time Firebase Sync for the Logged-in User! 📡🔥
   useEffect(() => {
     if (user) {
+      setLoading(true);
       const userRef = ref(db, `users/${user}`);
       
-      // onValue listens for ANY changes to this user in Firebase 🎧
       const unsubscribe = onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
           
-          // Sync Members 🎒
-          setMembers(data.members || []);
-          
-          // Sync Expenses (Firebase stores lists as objects, so we convert it to an array!) 💸
-          if (data.expenses) {
-             // Convert the object of push-IDs into an array of objects
-             const expensesArray = Object.keys(data.expenses).map(key => ({
-                 ...data.expenses[key],
-                 firebaseKey: key // Keep the key just in case we need to delete it later! 🗑️
-             }));
-             setExpenses(expensesArray);
+          if (data.trips) {
+            // 1. Transform trips object into an array
+            const tripsArray = Object.keys(data.trips).map(key => ({
+                ...data.trips[key],
+                firebaseKey: key
+            }));
+
+            setTripDetails(prev => {
+              // 2. Figure out which trip is "Active"
+              // Priority: Currently selected > First trip in list > null
+              const newActive = prev.activeTrip 
+                ? tripsArray.find(t => t.firebaseKey === prev.activeTrip.firebaseKey) || tripsArray[0]
+                : tripsArray[0];
+
+              // 3. Update the global members and expenses based on the ACTIVE trip 🎯
+              if (newActive) {
+                setMembers(newActive.members || []);
+                
+                if (newActive.expenses) {
+                  const expensesArray = Object.keys(newActive.expenses).map(key => ({
+                      ...newActive.expenses[key],
+                      firebaseKey: key
+                  }));
+                  setExpenses(expensesArray);
+                } else {
+                  setExpenses([]);
+                }
+              }
+
+              return { allTrips: tripsArray, activeTrip: newActive };
+            });
+
           } else {
-             setExpenses([]);
+            // Reset if no trips exist
+            setTripDetails({ allTrips: [], activeTrip: null });
+            setMembers([]);
+            setExpenses([]);
           }
         }
+        setLoading(false); 
+      }, (error) => {
+        console.error(error);
+        setLoading(false);
       });
 
-      // Cleanup listener when user logs out or component unmounts 🧹
-      return () => unsubscribe();
+      return () => unsubscribe(); 
     }
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, usernames, setUsernames, members, setMembers, expenses, setExpenses }}>
+    <UserContext.Provider value={{ 
+      user, setUser, usernames, setUsernames, 
+      members, setMembers, expenses, setExpenses, loading, 
+      tripDetails, setTripDetails
+    }}>
       {children}
     </UserContext.Provider>
   );

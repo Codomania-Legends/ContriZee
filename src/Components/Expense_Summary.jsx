@@ -1,51 +1,37 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 import { useUser } from '../UserContext'; 
 
 function Expense_Summary() {
     const navigate = useNavigate();
     
-    // Pull the real-time synced expenses directly from Context! 📥🔥
     const { expenses } = useUser();
     
-    // Calculate the Total Trip Cost 🧮
     const totalCost = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
-    useEffect(() => {
-        if (expenses.length === 0) {
-           // navigate("/select-expense"); // Optional: You might want to remove this so they can see an empty summary page! 🏜️
-        }
-    }, [expenses, navigate]);
-
     return (
-       /* KEEP ALL YOUR RETURN JSX EXACTLY THE SAME AS BEFORE! 🎨 */
-       <div className="max-w-md mx-auto p-6 min-h-screen">
-            {/* Header 🏷️ */}
+        <div className="max-w-md mx-auto p-6 min-h-screen">
             <div className="flex items-center justify-between mb-8">
-                {/* Changed the back button to just navigate to the route without passing state! 🔙 */}
                 <button onClick={() => navigate("/select-expense")} className="text-gray-400 hover:text-black transition-colors">
                     ← Back
                 </button>
                 <h2 className="text-xl font-black tracking-tighter uppercase italic">Trip Summary 🎒</h2>
-                <div className="w-6"></div> {/* Spacer for balance ⚖️ */}
+                <div className="w-6"></div> 
             </div>
 
-            {/* 1. Grand Total Card 💳 */}
             <div className="bg-indigo-600 medium-box-shadow rounded-2xl p-8 shadow-xl shadow-indigo-200 mb-10 relative overflow-hidden">
                 <div className="relative z-10">
                     <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-2">Total Spends</p>
                     <h1 className="text-5xl font-black">₹{totalCost.toLocaleString()}</h1>
                 </div>
-                {/* Decorative background circle 🎨 */}
                 <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500 rounded-full opacity-50"></div>
             </div>
 
-            {/* 2. Transaction List 📜 */}
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4 px-2">History</h3>
             <div className="space-y-4">
                 {expenses.length > 0 ? (
                     expenses.map((exp) => (
-                        <div key={exp.id} className="bg-white small-box-shadow p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-indigo-300 transition-all">
+                        <div key={exp.id} className="bg-white small-box-shadow p-4 rounded-2xl shadow-sm flex items-center justify-between group transition-all">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl group-hover:bg-indigo-50 transition-colors">
                                     {exp.category === 'Food' ? '🍔' : exp.category === 'Stay' ? '🏨' : '🚕'}
@@ -67,12 +53,11 @@ function Expense_Summary() {
                 )}
             </div>
 
-            {/* 3. Action Button: The Settlement Algorithm ⚙️ */}
             {expenses.length > 0 && (
                 <div className="mt-10">
                     <button 
                         onClick={() => navigate('/settle-debts', { state: { expenses } })}
-                        className="w-full bg-black small-box-shadow text-black py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3"
+                        className="w-full bg-black small-box-shadow text-white py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3"
                     >
                         <span>Calculate Smart Settlement</span>
                         <span className="bg-white/20 px-2 py-0.5 rounded text-xs">AI Optimized 🧠</span>

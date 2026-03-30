@@ -5,16 +5,21 @@ import Xarrow from 'react-xarrows';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useUser } from '../UserContext';
+import { sileo } from 'sileo';
 
 const colors = ["#C599B6", "#eff7f6" ,"#50E3C2", "#B8E986", "#ff8fab", "#d5bdaf", "#a2d2ff", "#cdb4db", "#e4c1f9"];
 
-function Settlement() {
+function Settlement({ openRouter }) { 
+
     const { members, expenses } = useUser();
     const [transactions, setTransactions] = useState([]);
     const [showOptions, setShowOptions] = useState(null);
+    const [exportFormat, setExportFormat] = useState("Quick ContriZee update: Hey [Payee], you're down ₹[Amount] for the latest bill. 💸 Hit me up when you've sent it so I can mark it settled! 📱⚡");
     const navigate = useNavigate();
 
-    const exportFormat = "Quick ContriZee update: Hey [Payee], you're down ₹[Amount] for the latest bill. 💸 Hit me up when you've sent it so I can mark it settled! 📱⚡";
+    useEffect( () => {
+        
+    } , [] )
 
     useEffect(() => {
         if (members.length > 0) {
@@ -41,13 +46,13 @@ function Settlement() {
         newTransactions.splice(index, 1);
         setTransactions(newTransactions);
         setShowOptions(null);
-        alert("Transaction marked as Settled! ✅");
+        sileo.useState("Transaction marked as Settled! ✅");
     };
 
     const handleAsk = (item) => {
         const text = exportFormat.replace("[Payee]", item.from).replace("[Amount]", item.amount.toFixed(2));
         navigator.clipboard.writeText(text);
-        alert(`Request copied for ${item.from}! 📋`);
+        sileo.success(`Request copied for ${item.from}! 📋`);
         setShowOptions(null);
     };
 

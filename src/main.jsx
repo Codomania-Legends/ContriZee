@@ -1,26 +1,60 @@
-import { StrictMode } from 'react'
+import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router' // or react-router-dom
-import Add_Members from './Components/Add_Members'
 import Select_Expense from './Components/Select_Expense'
 import Expense_Summary from './Components/Expense_Summary'
 import Settlement from './Components/Settlement.jsx'
 import Signup from './Components/Signup.jsx'
 import Login from './Components/Login.jsx'
-import { UserProvider } from './UserContext.jsx' // <-- Import Provider
-import { Toaster } from 'sileo'
+import { UserProvider, useUser } from './UserContext.jsx' // <-- Import Provider
+import { sileo, Toaster } from 'sileo'
 import 'sileo/styles.css'
+import { WhoPaysNext } from './Utility/Help.jsx'
+import { OpenRouter } from '@openrouter/sdk';
 
-const HomeLayout = () => (
+const HomeLayout = () => {
+  return (
   <div className='home-main-container'>
     <img src="/Background.svg" alt="Background" className='bgImg' />
     <Outlet />
   </div>
-);
+)};
+
+const Layout = ({openRouter}) => {
+  const {members, expenses} = useUser()
+
+  return (
+  <div className='main-container'>
+    <Outlet />
+    <button className='absolute left-0 top-0 small-box-shadow bg-black text-white rounded-full px-4 py-2' 
+      onClick={() => {
+  sileo.promise(WhoPaysNext(members, expenses, openRouter), {
+    loading: {
+      title: "Analyzing...",
+      description: "Asking the AI oracle...",
+    },
+    success: (data) => ({
+      title: "From my Analysis...",
+      description: data, // 'data' is the string returned by WhoPaysNext
+      type: "success",
+    }),
+    error: {
+      title: "Error",
+      description: "Something went wrong with the AI.",
+    }
+  });
+}}>
+          Who Pays Next?
+    </button>
+  </div>
+)};
 
 const Root = () => {
+  const openRouter = new OpenRouter({
+    apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
+  });
   return (
     <UserProvider>
       <Toaster
@@ -43,10 +77,12 @@ const Root = () => {
             <Route path='/' element={<Signup />} />
             <Route path='/login' element={<Login />} />
           </Route>
-          <Route path="/add-members" element={<App />} />
-          <Route path="/select-expense" element={<Select_Expense />} />
-          <Route path="/expense-summary" element={<Expense_Summary />} />
-          <Route path="/settle-debts" element={<Settlement />} />
+          <Route element={<Layout openRouter={openRouter}/>}>
+            <Route path="/add-members" element={<App />} />
+            <Route path="/select-expense" element={<Select_Expense />} />
+            <Route path="/expense-summary" element={<Expense_Summary />} />
+            <Route path="/settle-debts" element={<Settlement openRouter={openRouter} />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </UserProvider>

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router'; // or 'react-router-dom'
 import { ref, set } from 'firebase/database';
 import { db } from '../firebase'; // Bring in your centralized db config! 🔥
 import { useUser } from '../UserContext'; // 🪄 Import Context
+import Cookies from 'js-cookie';
 
 function Signup() {
     const navigate = useNavigate();
@@ -65,7 +66,7 @@ function Signup() {
             </div>
             
             <div className='w-[40%] h-[50%] flex justify-center items-center flex-col'>
-                <div className='w-[70%] h-full white small-box-shadow rounded-4xl flex justify-center items-center flex-col'>
+                <div className='w-[70%] h-full bg-white small-box-shadow rounded-4xl flex justify-center items-center flex-col'>
                     <h1 className='text-2xl font-["Syne"] mb-4 font-extrabold'>New Account? ✨</h1>
                     
                     {/* Moved HandleSubmit to the form's onSubmit! ⌨️ */}
@@ -101,7 +102,7 @@ function Signup() {
                             </div>
                         </div>
                         
-                        <button type='submit' className='small-box-shadow p-3 px-12 black text-white rounded-4xl hover:scale-105 active:scale-95 transition-transform'>
+                        <button type='submit' className='small-box-shadow p-3 px-12 bg-black text-white rounded-4xl hover:scale-105 active:scale-95 transition-transform'>
                             Create Account
                         </button>
                     </form>

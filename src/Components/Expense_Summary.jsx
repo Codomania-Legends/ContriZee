@@ -19,12 +19,12 @@ function Expense_Summary() {
                 <div className="w-6"></div> 
             </div>
 
-            <div className="bg-indigo-600 medium-box-shadow rounded-2xl p-8 shadow-xl shadow-indigo-200 mb-10 relative overflow-hidden">
+            <div className="bg-[#C599B6] medium-box-shadow rounded-2xl p-8 shadow-xl shadow-[#d8bfcb] mb-10 relative overflow-hidden">
                 <div className="relative z-10">
-                    <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-2">Total Spends</p>
-                    <h1 className="text-5xl font-black">₹{totalCost.toLocaleString()}</h1>
+                    <p className="text-[#8f577c] text-xs font-bold uppercase tracking-widest mb-2">Total Spends</p>
+                    <h1 className="text-5xl text-white font-black">₹{totalCost.toLocaleString()}</h1>
                 </div>
-                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500 rounded-full opacity-50"></div>
+                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#9e6a8d] rounded-full opacity-50"></div>
             </div>
 
             <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4 px-2">History</h3>
@@ -38,7 +38,7 @@ function Expense_Summary() {
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-gray-800">{exp.item}</h4>
-                                    <p className="text-xs text-gray-400">Paid by <span className="text-indigo-600 font-semibold">{exp.paidBy}</span></p>
+                                    <p className="text-xs text-gray-400">Paid by <span className="text-[#8f577c] font-semibold">{exp.paidBy}</span></p>
                                 </div>
                             </div>
                             <div className="text-right">
@@ -57,7 +57,7 @@ function Expense_Summary() {
                 <div className="mt-10">
                     <button 
                         onClick={() => navigate('/settle-debts', { state: { expenses } })}
-                        className="w-full bg-black small-box-shadow text-white py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3"
+                        className="w-full bg-[#C599B6] small-box-shadow text-white py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3"
                     >
                         <span>Calculate Smart Settlement</span>
                         <span className="bg-white/20 px-2 py-0.5 rounded text-xs">AI Optimized 🧠</span>

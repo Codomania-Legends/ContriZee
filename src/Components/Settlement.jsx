@@ -4,23 +4,19 @@ import { useLocation, useNavigate } from 'react-router';
 import Xarrow from 'react-xarrows'; 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useUser } from '../UserContext'; // 🪄 Import the Context!
+import { useUser } from '../UserContext';
 
-const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"];
+const colors = ["#C599B6", "#eff7f6" ,"#50E3C2", "#B8E986", "#ff8fab", "#d5bdaf", "#a2d2ff", "#cdb4db", "#e4c1f9"];
 
-function Settlement() { // 🧹 Removed 'members' from props
-    // 📥 Pull members from global state!
+function Settlement() {
     const { members, expenses } = useUser();
-    
     const [transactions, setTransactions] = useState([]);
-    const [showOptions, setShowOptions] = useState(null); // Track which member is clicked
-    const location = useLocation();
+    const [showOptions, setShowOptions] = useState(null);
     const navigate = useNavigate();
 
     const exportFormat = "Quick ContriZee update: Hey [Payee], you're down ₹[Amount] for the latest bill. 💸 Hit me up when you've sent it so I can mark it settled! 📱⚡";
 
     useEffect(() => {
-        // Only run if we actually have members and expenses to avoid crash 🛡️
         if (members.length > 0) {
             const Details = {
                 members: members.map(m => m.name),
@@ -31,16 +27,17 @@ function Settlement() { // 🧹 Removed 'members' from props
         }
     }, [members, expenses]);
 
-    // Animation for the popup buttons 🎬
     useGSAP(() => {
         if (showOptions !== null) {
-            gsap.fromTo(".options-popup", { opacity: 0, scale: 0.8, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(1.7)" });
+            gsap.fromTo(".options-popup", 
+                { opacity: 0, scale: 0.8, y: 10 }, 
+                { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(1.7)" }
+            );
         }
     }, [showOptions]);
 
     const handleSettle = (index) => {
         const newTransactions = [...transactions];
-        // Remove the transaction from the list 🗑️
         newTransactions.splice(index, 1);
         setTransactions(newTransactions);
         setShowOptions(null);
@@ -55,99 +52,103 @@ function Settlement() { // 🧹 Removed 'members' from props
     };
 
     const radius = 250; 
-    const center = { x: 300, y: 300 }; 
+    const centerD = { x: 300, y: 300 }; 
+
+    const [dimensions, setDimensions] = useState({
+    width: window.innerWidth > 768 ? 600 : 350,
+    radius: window.innerWidth > 768 ? 250 : 130,
+    nodeSize: window.innerWidth > 768 ? 120 : 80
+});
+
+// 2. Update dimensions on resize
+useEffect(() => {
+    const handleResize = () => {
+        const isDesktop = window.innerWidth > 768;
+        setDimensions({
+            width: isDesktop ? 600 : 350,
+            radius: isDesktop ? 220 : 120, // Reduced radius slightly to prevent clipping
+            nodeSize: isDesktop ? 120 : 80
+        });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+}, []);
+
+const center = dimensions.width / 2;
 
     return (
-        <div style={{ padding: '40px', fontFamily: 'sans-serif', position: 'relative' }}>
-            {/* Header with Back button 🔙 */}
+        <div className="p-10 font-sans w-full flex flex-col items-center justify-center relative min-h-screen">
+            {/* Header */}
             <div className="flex items-center justify-between mb-8 max-w-2xl mx-auto">
-                <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-black transition-colors">
+                <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-black px-8 transition-colors">
                     ← Back
                 </button>
-                <h2 style={{ textAlign: 'center', margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>Settlement Plan 💸</h2>
-                <div style={{ width: '50px' }}></div> {/* Spacer ⚖️ */}
+                <h2 className="text-2xl px-8 font-bold text-center m-0">Settlement Plan 💸</h2>
+                <div className="w-[50px]"></div>
             </div>
 
-            {/* Circular Graph Area 🕸️ */}
-            <div style={{ position: 'relative', width: '600px', height: '600px', margin: '0 auto', zIndex: 1 }}>
-                
+            {/* Circular Graph Area */}
+            <div 
+                className="relative z-10 touch-none" 
+                style={{ width: `${dimensions.width}px`, height: `${dimensions.width}px` }}
+            >
                 {members.map((m, index) => {
                     const angle = (index / members.length) * 2 * Math.PI;
-                    const x = center.x + radius * Math.cos(angle) - 60;
-                    const y = center.y + radius * Math.sin(angle) - 60;
+                    // Calculate coordinates based on dynamic center and radius
+                    const x = center + dimensions.radius * Math.cos(angle) - (dimensions.nodeSize / 2);
+                    const y = center + dimensions.radius * Math.sin(angle) - (dimensions.nodeSize / 2);
 
                     const pendingTransactionIdx = transactions.findIndex(t => t.from === m.name);
                     const pendingTransaction = transactions[pendingTransactionIdx];
+                    const color = colors[index % colors.length];
 
                     return (
                         <div 
                             id={m.name} 
                             key={m.name}
                             onClick={() => pendingTransaction ? setShowOptions(showOptions === index ? null : index) : null}
-                            style={{
-                                position: 'absolute', 
+                            style={{ 
                                 left: `${x}px`, 
-                                top: `${y}px`,
-                                width: '120px', 
-                                height: '120px',
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                justifyContent: 'center',
-                                borderRadius: '50%', 
-                                border: `3px solid ${colors[index % colors.length]}`,
-                                background: '#f9f9f9', 
-                                fontWeight: 'bold', 
-                                color: colors[index % colors.length],
-                                cursor: pendingTransaction ? 'pointer' : 'default',
-                                zIndex: 20,
-                                overflow: 'visible',
-                                animation : true
+                                top: `${y}px`, 
+                                width: `${dimensions.nodeSize}px`, 
+                                height: `${dimensions.nodeSize}px`,
+                                backgroundColor: color, 
+                                color: color 
                             }}
-                            className='small-box-shadow'
+                            className={`absolute flex items-center justify-center rounded-full small-box-shadow font-bold z-20 overflow-visible shadow-lg transition-all duration-300 ${pendingTransaction ? 'cursor-pointer' : 'cursor-default'}`}
                         >
-                            {/* POPUP MENU 💬 */}
+                            {/* POPUP MENU - Adjusted for mobile scale */}
                             {showOptions === index && (
-                                <div 
-                                    className="options-popup" 
-                                    style={{
-                                        position: 'absolute',
-                                        top: '-90px', 
-                                        left: '50%',
-                                        transform: 'translateX(-50%)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '8px',
-                                        zIndex: 999, 
-                                        pointerEvents: 'auto' 
-                                    }}
-                                >
+                                <div className="options-popup absolute -top-20 md:-top-[90px] left-1/2 -translate-x-1/2 flex flex-col gap-1 md:gap-2 z-[999]">
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); handleAsk(pendingTransaction); }}
-                                        className="bg-blue-500 text-white text-[11px] px-4 py-2 rounded-full shadow-xl whitespace-nowrap hover:scale-105 transition-transform"
+                                        className="bg-blue-500 text-white text-[9px] md:text-[11px] px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-xl whitespace-nowrap"
                                     >
-                                        📩 Ask Money
+                                        📩 Ask
                                     </button>
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); handleSettle(pendingTransactionIdx); }}
-                                        className="bg-green-600 text-white text-[11px] px-4 py-2 rounded-full shadow-xl whitespace-nowrap hover:scale-105 transition-transform"
+                                        className="bg-green-600 text-white text-[9px] md:text-[11px] px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-xl whitespace-nowrap"
                                     >
-                                        ✅ Settle Now
+                                        ✅ Settle
                                     </button>
                                 </div>
                             )}
 
-                            {/* Node Avatar 👤 */}
-                            <div className='flex flex-col items-center justify-center'>
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mb-1">
+                            {/* Node Avatar - Scaled for mobile */}
+                            <div className="flex flex-col items-center justify-center scale-75 md:scale-100">
+                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mb-1">
                                     {m.name.charAt(0).toUpperCase()}
                                 </div>
-                                <span className="text-xs">{m.name}</span>
+                                <span className="text-[10px] md:text-xs text-black truncate max-w-[60px] md:max-w-none">
+                                    {m.name}
+                                </span>
                             </div>
                         </div>
                     );
                 })}
 
-                {/* Xarrows connecting the nodes 🔗 */}
+                {/* Xarrows remains the same as it uses IDs to track the elements */}
                 {transactions.map((item, index) => (
                     <Xarrow
                         key={index}
@@ -156,34 +157,33 @@ function Settlement() { // 🧹 Removed 'members' from props
                         path="smooth"
                         curviness={0.5}
                         color="#4ade80" 
-                        strokeWidth={2}
-                        breakpoint={0.5}
+                        strokeWidth={window.innerWidth > 768 ? 2 : 1.5}
                         dashness={{ strokeLen: 8, nonStrokeLen: 6, animation: true }}
                         labels={{ 
                             middle: (
-                                <div className="bg-white px-3 py-1 rounded-full border border-green-500 text-sm font-bold text-green-700 shadow-sm">
-                                    ₹{item.amount.toFixed(2)}
-                                    <span className="pulse"></span>
+                                <div className="bg-white px-2 py-0.5 md:px-3 md:py-1 rounded-full border border-green-500 text-[10px] md:text-sm font-bold text-green-700 shadow-sm flex items-center gap-1">
+                                    ₹{item.amount.toFixed(0)}
+                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
                                 </div>
                             ) 
                         }}
-                        headSize={5}
+                        headSize={window.innerWidth > 768 ? 5 : 3}
                     />
                 ))}
             </div>
 
-            {/* Summary List Area 📝 */}
-            <div style={{ marginTop: '50px', background: '#f4f4f4', padding: '20px', borderRadius: '15px' }} className="max-w-2xl mx-auto">
+            {/* Summary List Area */}
+            <div className="mt-12 bg-[#d3d3d3] p-5 big-box-shadow rounded-2xl w-full shadow-inner">
                 <h3 className="font-bold mb-3">Active Debts 📋</h3>
                 {transactions.length === 0 ? (
                     <p className="text-green-600 font-medium">Everyone is square! No debts found. ✨</p>
                 ) : (
                     transactions.map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
-                            <span><b>{item.from}</b> owes <b>{item.to}</b>: ₹{item.amount.toFixed(2)}</span>
+                        <div key={idx} className="flex justify-between items-center py-2 border-b-2 solid border-gray-100 last:border-">
+                            <span><b className="font-bold">{item.from}</b> owes <b className="font-bold">{item.to}</b>: ₹{item.amount.toFixed(2)}</span>
                             <button 
                                 onClick={() => handleSettle(idx)}
-                                className="text-xs bg-white border border-green-500 text-green-600 px-2 py-1 rounded-md hover:bg-green-50 active:scale-95 transition-transform"
+                                className="text-xs bg-white border border-green-500 text-green-600 px-3 py-1 rounded-md hover:bg-green-50 active:scale-95 transition-all"
                             >
                                 Settle
                             </button>
@@ -191,26 +191,6 @@ function Settlement() { // 🧹 Removed 'members' from props
                     ))
                 )}
             </div>
-
-            <style>
-                {`
-                    .small-box-shadow { box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; }
-                    .small-box-shadow:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
-                    @keyframes pulse {
-                        0% { transform: scale(1); opacity: 1; }
-                        50% { transform: scale(1.1); opacity: 0.7; }
-                        100% { transform: scale(1); opacity: 1; }
-                    }
-                    .pulse {
-                        display: inline-block;
-                        width: 8px;
-                        height: 8px;
-                        border-radius: 50%;
-                        background: lightgreen;
-                        animation: pulse 1.5s infinite;
-                    }
-                `}
-            </style>
         </div>
     );
 }

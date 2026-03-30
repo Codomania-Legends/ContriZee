@@ -41,8 +41,8 @@ function Select_Expense() {
 
     const categories = {
         Food: { icon: "🍔", items: ["Breakfast", "Lunch", "Dinner", "Snacks", "Drinks", "Water Bottle", "Other"] },
-        Stay: { icon: "🏨", items: ["Hotel", "PG", "Hostel", "Resort", "Homestay", "Campsite", "Airbnb", "Guest House", "Other"] },
-        Travel: { icon: "🚕", items: ["Cab", "Toll", "Tickets", "Personal Vehicle( Petrol/Diesel/CNG )", "Parking", "Public Transport", "Other"] }
+        Stay: { icon: "🏨", items: ["Hotel", "PG", "Hostel", "Resort", "Airbnb", "Guest House", "Other"] },
+        Travel: { icon: "🚕", items: ["Cab", "Toll", "Tickets", "Personal Vehicle( Petrol/Diesel/CNG )", "Parking", "Other"] }
     };
 
     const handleAddExpense = (finalInrValue) => {
@@ -110,13 +110,13 @@ function Select_Expense() {
                                 }}
                                 className={`w-14 h-14 small-box-shadow rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all ${
                                     selectedMember === m.id 
-                                    ? 'pink text-black scale-110 border-black' 
+                                    ? 'bg-[#C599B6] text-white scale-110 border-black' 
                                     : 'bg-white border-gray-200 text-gray-400'
                                 }`}
                             >
                                 {m.name.charAt(0).toUpperCase()}
                             </button>
-                            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">{m.name}</span>
+                            <span className={`text-[10px] font-bold uppercase tracking-tighter ${selectedMember === m.id ? 'text-[#613051]' : 'text-gray-400'}`}>{m.name}</span>
                         </div>
                     ))}
                 </div>
@@ -125,7 +125,7 @@ function Select_Expense() {
             {/* 2. Categories Row 🏷️ */}
             {selectedMember && (
                 <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="flex justify-around items-center pink p-4 rounded-2xl medium-box-shadow bg-amber-950 text-white">
+                    <div className="flex justify-around items-center pink p-4 rounded-2xl medium-box-shadow bg-[#C599B6] text-white">
                         {Object.keys(categories).map((cat) => (
                             <button 
                                 key={cat}
@@ -136,11 +136,11 @@ function Select_Expense() {
                                 className="flex items-center gap-2 group"
                             >
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                    selectedCategory === cat ? 'border-emerald-200' : 'border-white'
+                                    selectedCategory === cat ? 'border-[#5f1c48]' : 'border-white'
                                 }`}>
-                                    {selectedCategory === cat && <div className="w-2.5 h-2.5 bg-emerald-200 rounded-full" />}
+                                    {selectedCategory === cat && <div className="w-2.5 h-2.5 bg-[#5f1c48] rounded-full" />}
                                 </div>
-                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-emerald-200' : 'text-white'}`}>
+                                <span className={`text-sm font-bold ${selectedCategory === cat ? 'text-[#5f1c48]' : 'text-white'}`}>
                                     {cat}
                                 </span>
                             </button>
@@ -158,7 +158,7 @@ function Select_Expense() {
                             onClick={() => setSelectedSub(item)}
                             className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all small-box-shadow ${
                                 selectedSub === item 
-                                ? 'border-red-900 text-red-900 bg-red-300' 
+                                ? 'border-[#C599B6] text-[#5f1c48] bg-[#C599B6]' 
                                 : 'border-gray-100 bg-white text-gray-500'
                             }`}
                         >
@@ -170,7 +170,7 @@ function Select_Expense() {
 
             {/* 4. Amount & Save Section 💰 */}
             {selectedSub && (
-                <div className="mt-6 p-6 medium-box-shadow rounded-[2.5rem] text-black shadow-xl animate-in slide-in-from-bottom-6 transition-all">
+                <div className="mt-6 p-6 medium-box-shadow rounded-[2.5rem]  shadow-xl animate-in slide-in-from-bottom-6 transition-all">
                     <div className="flex justify-between items-center mb-6">
                         <p className="text-[#8f577c] text-[10px] uppercase font-bold tracking-widest">Amount for {selectedSub}</p>
                         <div className="flex bg-white/10 p-1 rounded-xl gap-1">
@@ -203,7 +203,7 @@ function Select_Expense() {
 
                     <div className="h-8 mb-6">
                         {convertedAmount > 0 && currency !== "INR" && (
-                            <div className="flex items-center gap-2 text-green-500 animate-in fade-in slide-in-from-left-2">
+                            <div className="flex items-center gap-2 text-[#8f577c] animate-in fade-in slide-in-from-left-2">
                                 <span className="text-lg font-black italic">
                                     ≈ ₹{(convertedAmount * rates[currency]).toFixed(2)} INR
                                 </span>
@@ -215,7 +215,7 @@ function Select_Expense() {
                         disabled={!convertedAmount || convertedAmount <= 0}
                         onClick={() => handleAddExpense(parseFloat(convertedAmount) * rates[currency])}
                         className={`w-full py-4 rounded-2xl font-black text-lg active:scale-95 transition-all small-box-shadow ${
-                            convertedAmount > 0 ? 'bg-red-900 text-white' : 'bg-gray-200 text-gray-400'
+                            convertedAmount > 0 ? 'bg-[#8f577c] text-white' : 'bg-gray-200 text-gray-400'
                         }`}
                     >
                         CONFIRM & ADD
@@ -228,7 +228,7 @@ function Select_Expense() {
                 <div className="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto z-50">
                     <button 
                         onClick={() => navigate('/expense-summary')}
-                        className="w-full bg-black text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl active:scale-95 transition-transform"
+                        className="w-full bg-black small-box-shadow text-white py-4 rounded-2xl font-bold flex justify-between items-center px-6 shadow-2xl active:scale-95 transition-transform"
                     >
                         <span>View {expenses.length} Expenses</span>
                         <span>→</span>

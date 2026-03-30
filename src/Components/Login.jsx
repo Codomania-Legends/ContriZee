@@ -44,7 +44,7 @@ function Login() {
     return (
         <div className='flex justify-center items-center h-screen'>
             <div className='w-[40%] h-[40%] flex justify-center items-center flex-col'>
-                <div className='w-[70%] h-full white small-box-shadow rounded-4xl flex justify-center items-center flex-col'>
+                <div className='w-[70%] h-full bg-white small-box-shadow rounded-4xl flex justify-center items-center flex-col'>
 
                     <h1 className='text-2xl font-["Syne"] mb-4 font-extrabold'>Login 🔐</h1>
                     
@@ -57,14 +57,14 @@ function Login() {
                                 type="text" 
                                 placeholder='Username' 
                                 id='username' 
-                                className='pl-6 h-[80%] w-full white small-box-shadow rounded-4xl flex justify-center items-center flex-col' 
+                                className='pl-6 h-[80%] w-full bg-white border-none outline-none small-box-shadow rounded-4xl flex justify-center items-center flex-col' 
                             />
                             <div className='flex h-[25%] w-full justify-center items-end flex-col text-[12px] cursor-pointer'>
                                 {/* Swapped 'a' tag for 'Link' for better React routing! 🔗 */}
                                 <Link to="/">Don't have an Account?</Link>
                             </div>
                         </div>
-                        <button type='submit' className='small-box-shadow p-3 px-12 black text-white rounded-4xl'>
+                        <button type='submit' className='small-box-shadow p-3 px-12 bg-black text-white rounded-4xl'>
                             Login
                         </button>
                     </form>

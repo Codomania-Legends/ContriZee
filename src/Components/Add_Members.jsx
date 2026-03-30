@@ -23,7 +23,10 @@ function Add_Members() {
         const tripListRef = ref(db, `users/${user}/trips`);
         const newTripRef = push(tripListRef);
         
-        const name = user.slice(0,1).toUpperCase().concat(user.slice(1));
+        let name = "";
+        if(user){
+            name = user?.slice(0,1).toUpperCase().concat(user.slice(1));
+        }
         
         const newTripData = {
             id: newTripRef.key,
@@ -82,15 +85,15 @@ function Add_Members() {
     return (
         <div className="min-h-screen pb-32">
             <div className='p-6 max-w-md mx-auto'>
-                <h2 className="text-2xl font-bold mb-4">Your Trips 🎒</h2>
+                <h2 className="text-2xl font-bold mb-8">Create Your Trip 🎒</h2>
                 
-                <div className="flex flex-col gap-3 mb-6">
+                <div className="flex flex-col gap-3 mb-10">
                     {tripDetails?.allTrips?.map((trip) => (
                         <button 
                             key={trip.id}
                             onClick={() => setTripDetails(prev => ({...prev, activeTrip: trip}))}
-                            className={`p-4 rounded-2xl text-left transition-all ${
-                                activeTrip?.id === trip.id ? 'pink border-2 border-black' : 'bg-gray-100'
+                            className={`p-4 small-box-shadow rounded-2xl text-left transition-all ${
+                                activeTrip?.id === trip.id ? 'bg-[#C599B6] text-white' : 'bg-gray-100 text-black'
                             }`}
                         >
                             <p className="font-bold">{trip.name}</p>
@@ -104,9 +107,9 @@ function Add_Members() {
                         value={trip_Name}
                         onChange={(e) => setTrip_Name(e.target.value)}
                         placeholder="New Trip Name (e.g. Goa 2026)"
-                        className="flex-1 px-4 py-2 rounded-lg border border-gray-300 outline-none"
+                        className="flex-1 px-4 border border-gray-300 py-3 outline-none rounded-lg"
                     />
-                    <button className="pink px-4 py-2 rounded-lg font-bold" onClick={addTrip}>Create</button>
+                    <button className="text-white px-4 py-3 small-box-shadow bg-[#C599B6] rounded-lg font-bold" onClick={addTrip}>Create</button>
                 </div>
             </div>
 
@@ -122,12 +125,12 @@ function Add_Members() {
                             placeholder="Friend's name..."
                             className="flex-1 px-4 py-2 rounded-lg border border-gray-300 outline-none"
                         />
-                        <button onClick={addMember} className="pink px-4 py-2 rounded-lg font-bold">Add</button>
+                        <button onClick={addMember} className="text-white px-4 py-3 small-box-shadow bg-[#C599B6] rounded-lg font-bold">Add</button>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
                         {members.map((m) => (
-                            <div key={m.id} className="flex items-center bg-gray-100 px-3 py-1.5 rounded-lg">
+                            <div key={m.id} className="flex items-center text-gray-500 smallest-box-shadow bg-white px-3 py-1.5 rounded-lg">
                                 <span className="text-sm font-medium">{m.name}</span>
                                 <button onClick={() => removeMember(m.id)} className="ml-2 text-gray-400 hover:text-red-500">×</button>
                             </div>
@@ -137,7 +140,7 @@ function Add_Members() {
             )}
 
             {/* Navigation Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-6">
+            <div className="fixed flex justify-center items-center bottom-0 left-0 right-0 p-6">
                 <button 
                     disabled={!canGoNext}
                     onClick={() => {
@@ -145,8 +148,8 @@ function Add_Members() {
                         console.log(Cookies.get("activeTrip"));
                         navigate("/select-expense")
                     }}
-                    className={`w-full py-4 rounded-2xl font-bold transition-all small-box-shadow ${
-                        canGoNext ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500'
+                    className={`w-[30%] py-4 rounded-2xl font-bold transition-all small-box-shadow ${
+                        canGoNext ? 'bg-green-500 text-white' : 'bg-[#C599B6] text-white'
                     }`}
                 >
                     {canGoNext ? "Start Splitting! →" : "Add at least 2 members"}

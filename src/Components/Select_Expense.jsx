@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { db } from '../firebase';
 import { useUser } from '../UserContext'; 
 import { sileo } from "sileo";
+import Cookies from 'js-cookie';
 
 function Select_Expense() {
     const navigate = useNavigate();
@@ -13,9 +14,9 @@ function Select_Expense() {
     const activeTrip = tripDetails?.activeTrip;
     useEffect( () => {
         if( !activeTrip ){
-            const tripCookie = document.cookie.split(";").find(row => row.trim().startsWith("activeTrip="));
-            setTripDetails({...tripDetails, activeTrip: tripCookie.split("=")[1]})
-            console.log("cookie check -, ",tripCookie.split("=")[1])
+            const tripCookie = Cookies.get("activeTrip");
+            console.log("cookie check -",tripCookie)
+            setTripDetails({...tripDetails, activeTrip: tripCookie})
             if( !tripCookie ){
                 navigate(`/add-members`)
             }

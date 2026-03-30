@@ -4,6 +4,7 @@ import { useUser } from '../UserContext';
 import { ref, set, push } from 'firebase/database';
 import { db } from '../firebase';
 import { sileo } from 'sileo';
+import Cookies from 'js-cookie';
 
 function Add_Members() {
     const { user, tripDetails, setTripDetails, setMembers } = useUser();

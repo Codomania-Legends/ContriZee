@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ref, get, child, onValue } from 'firebase/database';
 import { db } from './firebase.js';
 import { sileo } from 'sileo'; 
+import Cookies from 'js-cookie';
 
 export const UserContext = createContext();
 
@@ -15,15 +16,15 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    const cookies = document.cookie.split(";");
-    const userCookie = cookies.find(row => row.trim().startsWith("username="));
-    const tripCookie = cookies.find(row => row.trim().startsWith("activeTrip="));
+    const userCookie = Cookies.get("username");
+    const tripCookie = Cookies.get("activeTrip");
     
     if (userCookie) {
-        setUser(userCookie.split("=")[1]);
+        setUser(userCookie);
     }
     if(tripCookie){
-        setTripDetails(prev => ({ ...prev, activeTrip: tripCookie.split("=")[1] }));
+        console.log("context : trip cookie - ", tripCookie)
+        setTripDetails(prev => ({ ...prev, activeTrip: tripCookie }));
     }
 
     const fetchUsernames = async () => {
@@ -57,30 +58,46 @@ export const UserProvider = ({ children }) => {
                 firebaseKey: key
             }));
 
+            console.log("context : tripsArray - ", tripsArray);
+            
+
             setTripDetails(prev => {
-              // 2. Figure out which trip is "Active"
-              // Priority: Currently selected > First trip in list > null
-              const newActive = prev.activeTrip 
-                ? tripsArray.find(t => t.firebaseKey === prev.activeTrip.firebaseKey) || tripsArray[0]
-                : tripsArray[0];
+  // 1. Convert the Firebase object into an array
+  const tripsArray = Object.keys(data.trips).map(key => ({
+    ...data.trips[key],
+    firebaseKey: key
+  }));
 
-              // 3. Update the global members and expenses based on the ACTIVE trip 🎯
-              if (newActive) {
-                setMembers(newActive.members || []);
-                
-                if (newActive.expenses) {
-                  const expensesArray = Object.keys(newActive.expenses).map(key => ({
-                      ...newActive.expenses[key],
-                      firebaseKey: key
-                  }));
-                  setExpenses(expensesArray);
-                } else {
-                  setExpenses([]);
-                }
-              }
+  // 2. Determine what our "target" trip name is.
+  // It's either the string from the cookie (prev.activeTrip) 
+  // or the name property of the current activeTrip object.
+  const targetTripName = typeof prev.activeTrip === 'string' 
+    ? prev.activeTrip 
+    : prev.activeTrip?.name;
 
-              return { allTrips: tripsArray, activeTrip: newActive };
-            });
+  let newActive = null;
+
+  if (targetTripName) {
+    // 3. Match the trip name from the cookie to an object in the array
+    newActive = tripsArray.find(t => t.name === targetTripName);
+  }
+
+  // 4. Default to the first trip ONLY if the cookie trip wasn't found
+  if (!newActive) {
+    newActive = tripsArray[0];
+  }
+
+  // 5. Update UI side-effects (Members and Expenses)
+  if (newActive) {
+    setMembers(newActive.members || []);
+    const expensesArray = newActive.expenses 
+      ? Object.keys(newActive.expenses).map(k => ({ ...newActive.expenses[k], firebaseKey: k }))
+      : [];
+    setExpenses(expensesArray);
+  }
+
+  return { allTrips: tripsArray, activeTrip: newActive };
+});
 
           } else {
             // Reset if no trips exist

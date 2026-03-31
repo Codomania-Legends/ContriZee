@@ -73,11 +73,11 @@ function Login() {
                 <img 
                     src="/BGlogin.svg" 
                     alt="background" 
-                    className='h-full -scale-x-100 object-cover'
+                    className='h-full -scale-x-100 '
                 />
-                <div className="absolute right-[25%] top-[30%]">
+                <div className="absolute right-[40%] top-[30%]">
                     <h1 className='text-3xl font-bold mb-2'>Welcome to 🎉</h1>
-                    <h1 className='text-5xl font-["Syne"] font-extrabold text-[#C599B6] drop-shadow-lg'>ContriZee</h1>
+                    <h1 className='text-5xl font-["Syne"] font-extrabold '>ContriZee</h1>
                 </div>
             </div>
         </div>

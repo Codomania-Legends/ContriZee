@@ -19,7 +19,7 @@ function Expense_Summary() {
         >
             <div className="flex items-center justify-between mb-8">
                 <button onClick={() => navigate("/select-expense")} className="text-gray-400 hover:text-black transition-colors">
-                    ← Back 🔙
+                    ← Back
                 </button>
                 <h2 className="text-xl font-black tracking-tighter uppercase italic">Trip Summary 🎒</h2>
                 <div className="w-6"></div> 

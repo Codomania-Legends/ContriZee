@@ -55,11 +55,11 @@ function Signup() {
                 <img 
                     src="/BGlogin.svg" 
                     alt="background" 
-                    className='h-full object-cover'
+                    className='h-full'
                 />
-                <div className="absolute left-[25%] top-[30%]">
+                <div className="absolute left-[40%] top-[30%]">
                     <h1 className='text-3xl font-bold mb-2'>Welcome to 🎉</h1>
-                    <h1 className='text-5xl font-["Syne"] font-extrabold text-[#C599B6] drop-shadow-lg'>ContriZee</h1>
+                    <h1 className='text-5xl font-["Syne"] font-extrabold '>ContriZee</h1>
                 </div>
             </div>
             

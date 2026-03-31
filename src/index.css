@@ -145,9 +145,15 @@ select {
 button {
   outline: none;
   border: none;
-  background-color: black;
-  color: white;
-  padding: 10px;
-  border-radius: 10px;
-  margin: 10px;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.main-container {
+  background-image: url("/Background.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }

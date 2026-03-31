@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router'; // or 'react-router-dom'
+import { useNavigate, Link } from 'react-router'; 
 import { ref, set } from 'firebase/database';
-import { db } from '../firebase'; // Bring in your centralized db config! 🔥
-import { useUser } from '../UserContext'; // 🪄 Import Context
+import { db } from '../firebase'; 
+import { useUser } from '../UserContext'; 
 import Cookies from 'js-cookie';
 
 function Signup() {
     const navigate = useNavigate();
     
-    // 1. Pull what you need directly from the Context! 📥
     const { user, setUser, usernames, tripDetails } = useUser();
 
     const [field, setField] = useState({
@@ -16,12 +15,8 @@ function Signup() {
         nickname: ""
     });
 
-    // Automatically send them to the app if they already have an active session! 🔀
     useEffect(() => {
-        console.log("user", user);
-        // If the user is already logged in (via Context/Cookie), send them straight in! 🏃‍♂️
         if(user){
-            console.log("Got TripDetails : ",tripDetails)
             if(tripDetails?.activeTrip){
                 navigate("/select-expense");
             }else{
@@ -31,7 +26,6 @@ function Signup() {
     }, [user, navigate, tripDetails]);
 
     const dataSet = () => {
-        // Cleaned up the Firebase 9 modular syntax! 🧹
         set(ref(db, `users/${field.username}`), {
             username: field.username,
             nickname: field.nickname
@@ -50,8 +44,6 @@ function Signup() {
         } else {
             dataSet(); 
             setUser(field.username);
-            // Added path=/ so the cookie is valid across all routes! 🍪
-            // document.cookie = `username=${field.username}; path=/; max-age=86400`; 
             Cookies.set("username", field.username, { expires: 7 });
             navigate("/add-members");
         }
@@ -59,51 +51,56 @@ function Signup() {
 
     return (
         <div className='flex justify-center items-center h-screen'>
-            <div className='w-[60%] h-full flex justify-center items-center'>
-                <img src="/BGlogin.svg" alt="background" className='h-full'/>
-                <h1 className='absolute left-[25%] top-[30%] text-3xl font-bold'>Welcome to 🎉</h1>
-                <h1 className='absolute left-[25%] top-[35%] text-4xl font-["Syne"] font-extrabold'>ContriZee</h1>
+            <div className='w-[60%] h-full flex justify-center items-center relative'>
+                <img 
+                    src="/BGlogin.svg" 
+                    alt="background" 
+                    className='h-full object-cover'
+                />
+                <div className="absolute left-[25%] top-[30%]">
+                    <h1 className='text-3xl font-bold mb-2'>Welcome to 🎉</h1>
+                    <h1 className='text-5xl font-["Syne"] font-extrabold text-[#C599B6] drop-shadow-lg'>ContriZee</h1>
+                </div>
             </div>
             
             <div className='w-[40%] h-[50%] flex justify-center items-center flex-col'>
                 <div className='w-[70%] h-full bg-white small-box-shadow rounded-4xl flex justify-center items-center flex-col'>
                     <h1 className='text-2xl font-["Syne"] mb-4 font-extrabold'>New Account? ✨</h1>
                     
-                    {/* Moved HandleSubmit to the form's onSubmit! ⌨️ */}
                     <form onSubmit={HandleSubmit} className='h-[70%] w-[80%] flex justify-around items-center flex-col'>
                         <div className='flex h-[20%] w-full justify-center items-start flex-col'>
-                            {/* <label htmlFor="username">Username</label> */}
                             <input 
                                 value={field.username} 
                                 onChange={(e) => setField({...field, username: e.target.value})} 
                                 type='text' 
-                                placeholder='Username' 
+                                placeholder='Username 👤' 
                                 id='username'
-                                className='pl-6 h-[80%] w-full white small-box-shadow rounded-4xl flex justify-center items-center flex-col outline-none focus:ring-2 focus:ring-pink-300' 
+                                className='pl-6 h-[80%] w-full white small-box-shadow rounded-4xl flex justify-center items-center flex-col outline-none focus:ring-2 focus:ring-[#C599B6] transition-all' 
                             />
                         </div>
                         
                         <div className='flex h-[25%] w-full justify-center items-start flex-col'>
-                            {/* <label htmlFor="nickname">Nickname</label> */}
                             <input 
                                 value={field.nickname} 
                                 onChange={(e) => setField({...field, nickname: e.target.value})} 
                                 type='text' 
-                                className='pl-6 h-[70%] w-full white small-box-shadow rounded-4xl flex justify-center items-center flex-col outline-none focus:ring-2 focus:ring-pink-300'
-                                placeholder='Nickname' 
+                                className='pl-6 h-[70%] w-full white small-box-shadow rounded-4xl flex justify-center items-center flex-col outline-none focus:ring-2 focus:ring-[#C599B6] transition-all'
+                                placeholder='Nickname 🏷️' 
                                 id='nickname' 
                             />
                             
-                            <div className='w-full flex cursor-pointer justify-center text-[12px] items-end flex-col'>
-                                {/* Upgraded to React Router's Link tag! 🔗 */}
-                                <Link to="/login" className="hover:text-pink-500 transition-colors">
-                                    Already have an Account?
+                            <div className='w-full flex cursor-pointer justify-center text-[12px] items-end flex-col mt-2'>
+                                <Link to="/login" className="text-gray-500 hover:text-[#C599B6] transition-colors font-semibold">
+                                    Already have an Account? 🤔
                                 </Link>
                             </div>
                         </div>
                         
-                        <button type='submit' className='small-box-shadow p-3 px-12 bg-black text-white rounded-4xl hover:scale-105 active:scale-95 transition-transform'>
-                            Create Account
+                        <button 
+                            type='submit' 
+                            className='small-box-shadow p-3 px-12 bg-black text-white rounded-4xl font-bold mt-4 hover:scale-105 active:scale-95 transition-transform'
+                        >
+                            Create Account 🚀
                         </button>
                     </form>
                 </div>

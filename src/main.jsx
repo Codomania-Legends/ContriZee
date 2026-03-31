@@ -1,24 +1,40 @@
-import { StrictMode, useState } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router' // or react-router-dom
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router' 
 import Select_Expense from './Components/Select_Expense'
 import Expense_Summary from './Components/Expense_Summary'
 import Settlement from './Components/Settlement.jsx'
 import Signup from './Components/Signup.jsx'
 import Login from './Components/Login.jsx'
-import { UserProvider, useUser } from './UserContext.jsx' // <-- Import Provider
+import { UserProvider, useUser } from './UserContext.jsx' 
 import { sileo, Toaster } from 'sileo'
 import 'sileo/styles.css'
 import { WhoPaysNext } from './Utility/Help.jsx'
 import { OpenRouter } from '@openrouter/sdk';
+import { motion, AnimatePresence } from 'framer-motion'; // <-- Imported Framer Motion 🎬✨
 
 const HomeLayout = () => {
   return (
         <div className='home-main-container'>
-          <img src="/Background.svg" alt="Background" className='bgImg' />
-          <Outlet />
+          {/* Added a slow zoom-in animation for the background 🖼️🔍 */}
+          <motion.img 
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            src="/Background.svg" 
+            alt="Background" 
+            className='bgImg' 
+          />
+          {/* Added a smooth slide-up and fade-in for the auth components 🚀⬆️ */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Outlet />
+          </motion.div>
         </div>
 )};
 
@@ -27,27 +43,42 @@ const Layout = ({openRouter}) => {
 
   return (
     <div className='main-container'>
-      <Outlet />
-      <button className='absolute left-0 top-0 small-box-shadow bg-black text-white rounded-full px-4 py-2' 
+      {/* Smooth fade-in for the main app pages 🌟👀 */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Outlet />
+      </motion.div>
+      
+      {/* Added bouncy hover and tap animations to the AI button! 🔘🎈 */}
+      <motion.button 
+        whileHover={{ scale: 1.05, y: -5 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        className='absolute left-10 bottom-5 small-box-shadow bg-[#C8A2C8] text-white rounded-full px-4 py-2' 
         onClick={() => {
           sileo.promise(WhoPaysNext(members, expenses, openRouter), {
             loading: {
               title: "Analyzing...",
-              description: "Asking the AI oracle...",
+              description: "Asking the AI oracle... 🤖🔮",
             },
             success: (data) => ({
               title: "From my Analysis...",
-              description: data, // 'data' is the string returned by WhoPaysNext
+              description: data, 
               type: "success",
             }),
             error: {
               title: "Error",
-              description: "Something went wrong with the AI.",
+              description: "Something went wrong with the AI. 🚨💔",
             }
           });
         }}>
-          Who Pays Next?
-      </button>
+          Who Pays Next? 🤔💸
+      </motion.button>
     </div>
 )};
 
@@ -56,6 +87,7 @@ const Root = () => {
   const openRouter = new OpenRouter({
     apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
   });
+  
   return (
     <UserProvider>
       <Toaster
@@ -74,7 +106,6 @@ const Root = () => {
       <BrowserRouter>
         <Routes>
           <Route element={<HomeLayout />}>
-            {/* Look at how clean these routes are now! */}
             <Route path='/' element={<Signup />} />
             <Route path='/login' element={<Login />} />
           </Route>

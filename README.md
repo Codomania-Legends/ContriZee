@@ -29,6 +29,15 @@
 [![See it in Action](https://img.shields.io/badge/Live_Demo-Watch_Now-blue?style=for-the-badge&logo=vercel)](https://your-live-demo-link.com) 
 **(Replace with your Vercel, Netlify, or Firebase hosting link)*
 
+##Visuals
+<img width="1919" height="1026" alt="image" src="https://github.com/user-attachments/assets/5ab0d5aa-fb81-4b9b-93a0-48bbcfe85d85" /></br>
+<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/543d7f97-4a5a-4d4c-85db-e4e83158b633" />
+<img width="1919" height="1025" alt="image" src="https://github.com/user-attachments/assets/06efafce-9661-40f4-9d4c-d2eba5c77c9c" />
+<img width="1919" height="1023" alt="image" src="https://github.com/user-attachments/assets/77b1e336-d41a-4ecf-9513-d894a8da19ec" />
+<img width="1915" height="1008" alt="image" src="https://github.com/user-attachments/assets/a9bba81d-9666-4b9d-b0f8-a004b6dd16e4" />
+<img width="1918" height="872" alt="image" src="https://github.com/user-attachments/assets/e96398f5-e257-4c26-99e2-d47770b5efe1" />
+
+
 ---
 
 ## ✨ Outstanding Features

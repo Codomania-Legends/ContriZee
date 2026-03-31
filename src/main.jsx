@@ -16,42 +16,43 @@ import { OpenRouter } from '@openrouter/sdk';
 
 const HomeLayout = () => {
   return (
-  <div className='home-main-container'>
-    <img src="/Background.svg" alt="Background" className='bgImg' />
-    <Outlet />
-  </div>
+        <div className='home-main-container'>
+          <img src="/Background.svg" alt="Background" className='bgImg' />
+          <Outlet />
+        </div>
 )};
 
 const Layout = ({openRouter}) => {
   const {members, expenses} = useUser()
 
   return (
-  <div className='main-container'>
-    <Outlet />
-    <button className='absolute left-0 top-0 small-box-shadow bg-black text-white rounded-full px-4 py-2' 
-      onClick={() => {
-  sileo.promise(WhoPaysNext(members, expenses, openRouter), {
-    loading: {
-      title: "Analyzing...",
-      description: "Asking the AI oracle...",
-    },
-    success: (data) => ({
-      title: "From my Analysis...",
-      description: data, // 'data' is the string returned by WhoPaysNext
-      type: "success",
-    }),
-    error: {
-      title: "Error",
-      description: "Something went wrong with the AI.",
-    }
-  });
-}}>
+    <div className='main-container'>
+      <Outlet />
+      <button className='absolute left-0 top-0 small-box-shadow bg-black text-white rounded-full px-4 py-2' 
+        onClick={() => {
+          sileo.promise(WhoPaysNext(members, expenses, openRouter), {
+            loading: {
+              title: "Analyzing...",
+              description: "Asking the AI oracle...",
+            },
+            success: (data) => ({
+              title: "From my Analysis...",
+              description: data, // 'data' is the string returned by WhoPaysNext
+              type: "success",
+            }),
+            error: {
+              title: "Error",
+              description: "Something went wrong with the AI.",
+            }
+          });
+        }}>
           Who Pays Next?
-    </button>
-  </div>
+      </button>
+    </div>
 )};
 
 const Root = () => {
+  console.log(import.meta.env.VITE_OPENROUTER_API_KEY)
   const openRouter = new OpenRouter({
     apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
   });

@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { splitExpenses } from '../Utility/Algo';
 import { useLocation, useNavigate } from 'react-router';
-import Xarrow from 'react-xarrows'; 
+import Xarrow, { useXarrow } from 'react-xarrows'; 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useUser } from '../UserContext'; 
 import { sileo } from 'sileo';
+import QRCode from 'qrcode';
 
 const colors = ["#4A90E2", "#50E3C2", "#B8E986", "#FFD200", "#FF6B6B"];
 
-function Settlement({ openRouter }) { 
+const CustomTriangleHead = () => (
+    <svg viewBox="0 0 20 20">
+        <polygon points="0,10 20,10 10,0" fill="green" />
+    </svg>
+);
 
+
+function Settlement({openRouter}) { 
+    const updateArrow = useXarrow();
     const { members, expenses } = useUser();
     
     const [transactions, setTransactions] = useState([]);
@@ -19,7 +27,27 @@ function Settlement({ openRouter }) {
     const navigate = useNavigate();
 
     useEffect( () => {
-        
+        async function Genarate_Text(){
+            try {
+                const res = await openRouter.chat.send({
+                    chatGenerationParams: {
+                        model: 'openrouter/free',
+                        messages: [
+                            {
+                                role: "user",
+                                content: "Generate a short, funny, and slightly passive-aggressive text message for a friend who owes me money. Make it sound like I'm joking but also hinting that I want my money back. Just give me the Text with no Options or extra text. Strictly follow the format:Use [Payee] for the name and [Amount] for the amount. also use Emojis to make it Light Hearted.",
+                            },
+                        ],
+                    },
+                });
+                setExportFormat(res.choices[0].message.content);
+                sileo.success({description : "Dynamic Text Generated Successfully!", title: "Success"})
+            } catch (error) {
+                console.log(error)
+                sileo.info({description : "Default Text Used", title: "Info"})
+            }
+        }
+        // Genarate_Text();
     } , [] )
 
     useEffect(() => {
@@ -42,7 +70,6 @@ function Settlement({ openRouter }) {
 
     const handleSettle = (index) => {
         const newTransactions = [...transactions];
-        // Remove the transaction from the list 🗑️
         newTransactions.splice(index, 1);
         setTransactions(newTransactions);
         setShowOptions(null);
@@ -58,6 +85,27 @@ function Settlement({ openRouter }) {
 
     const radius = 250; 
     const center = { x: 300, y: 300 }; 
+
+    const [qr_data , setQR_data] = useState({
+        upi_id: '',
+        amount: '',
+        name: '',
+        for : ""
+    })
+
+    const canvas_ref = useRef(null)
+
+    const generateQR = () => {
+        if( !qr_data.upi_id ){
+            sileo.error({description : "Please fill all the fields", title: "Error"})
+            return
+        }
+        const data = `upi://pay?pa=${qr_data.upi_id}&pn=${qr_data.name}&am=${qr_data.amount}`
+        QRCode.toCanvas(canvas_ref.current, data, {width: 200}, (error) => {
+            if (error) sileo.error({description : "Error Generating QR Code", title: "Error"})
+            else sileo.success({description : "QR Code Generated Successfully!", title: "Success"})
+        })
+    }
 
     return (
         <div style={{ padding: '40px', fontFamily: 'sans-serif', position: 'relative' }}>
@@ -150,28 +198,51 @@ function Settlement({ openRouter }) {
                 })}
 
                 {/* Xarrows connecting the nodes 🔗 */}
-                {transactions.map((item, index) => (
-                    <Xarrow
-                        key={index}
-                        start={item.from}
-                        end={item.to}
-                        path="smooth"
-                        curviness={0.5}
-                        color="#4ade80" 
-                        strokeWidth={2}
-                        breakpoint={0.5}
-                        dashness={{ strokeLen: 8, nonStrokeLen: 6, animation: true }}
-                        labels={{ 
-                            middle: (
-                                <div className="bg-white px-3 py-1 rounded-full border border-green-500 text-sm font-bold text-green-700 shadow-sm">
-                                    ₹{item.amount.toFixed(2)}
-                                    <span className="pulse"></span>
-                                </div>
-                            ) 
+                {transactions.map((item, index) => {
+    const fromIndex = members.findIndex(m => m.name === item.from);
+    const toIndex = members.findIndex(m => m.name === item.to);
+
+    // Decide label side based on direction
+    const isRightSide = fromIndex < toIndex;
+
+    return (
+        <Xarrow
+            updateArrow={updateArrow}
+            key={`${item.from}-${item.to}-${index}`}
+            start={item.from}
+            end={item.to}
+            path="smooth"
+            curviness={0.8}
+            color="#4ade80"
+            strokeWidth={2}
+
+            // 🔥 Better animation (see section 2)
+            animateDrawing={1.2}
+
+            dashness={{
+                strokeLen: 6,
+                nonStrokeLen: 6,
+                animation: true
+            }}
+
+            labels={{
+                [isRightSide ? "end" : "start"]: (
+                    <div
+                        style={{
+                            transform: "translateY(-10px)",
                         }}
-                        headSize={5}
-                    />
-                ))}
+                        className="bg-white px-3 py-1 rounded-full border border-green-500 text-xs font-bold text-green-700 shadow-md"
+                    >
+                        ₹{item.amount.toFixed(2)}
+                    </div>
+                )
+            }}
+
+            headSize={6}
+            showHead={true}
+        />
+    );
+})}
             </div>
 
             {/* Summary List Area 📝 */}
@@ -192,6 +263,25 @@ function Settlement({ openRouter }) {
                         </div>
                     ))
                 )}
+            </div>
+
+            <div>
+                <input value={qr_data.upi_id} onChange={(e) => setQR_data({...qr_data, upi_id: e.target.value})} placeholder='UPI ID'/>
+                {
+                    transactions.map((item, idx) => {
+                        console.log(item)
+                        return (
+                        <button key={idx} onClick={() => {
+                            setQR_data({...qr_data, amount: item.amount, for: item.from})
+                            generateQR()
+                            }}>Generate QR for {item.from} to pay {item.to}</button>
+                    )})
+                }
+            </div>
+            <div className='flex flex-col items-center justify-center'>
+                <span>QR code generated for {qr_data.for}</span>
+                <h4>Scan this to pay <button>{qr_data.amount}</button> to {qr_data.from}</h4>
+                <canvas ref={canvas_ref} id='qr-code'></canvas>
             </div>
 
             <style>

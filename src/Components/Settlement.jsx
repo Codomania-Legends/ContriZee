@@ -102,12 +102,15 @@ function Settlement({openRouter}) {
 
     const canvas_ref = useRef(null)
 
-    const generateQR = () => {
-        if( !qr_data.upi_id ){
-            sileo.error({description : "Please fill all the fields 🛑", title: "Error"})
+    // UPDATED generateQR FUNCTION 🛠️
+    const generateQR = (targetUpi, targetName, targetAmount) => {
+        if(!targetUpi){
+            sileo.error({description : "Please enter a UPI ID first 🛑", title: "Error"})
             return
         }
-        const data = `upi://pay?pa=${qr_data.upi_id}&pn=${qr_data.name}&am=${qr_data.amount}`
+        // Added cu=INR and URL encoded the Payee Name 🇮🇳
+        const data = `upi://pay?pa=${targetUpi}&pn=${encodeURIComponent(targetName)}&am=${targetAmount}&cu=INR`
+        
         QRCode.toCanvas(canvas_ref.current, data, {width: 200}, (error) => {
             if (error) sileo.error({description : "Error Generating QR Code 🚨", title: "Error"})
             else sileo.success({description : "QR Code Generated Successfully! 📱", title: "Success"})
@@ -251,9 +254,10 @@ function Settlement({openRouter}) {
                     {transactions.map((item, idx) => (
                         <button 
                             key={idx} 
+                            // UPDATED ONCLICK LOGIC 🎯
                             onClick={() => {
-                                setQR_data({...qr_data, amount: item.amount, for: item.from})
-                                setTimeout(generateQR, 100); 
+                                setQR_data({...qr_data, amount: item.amount, for: item.from, name: item.to})
+                                generateQR(qr_data.upi_id, item.to, item.amount); 
                             }}
                             className="bg-[#C599B6] text-white text-xs px-4 py-2 rounded-full hover:bg-[#8f577c] transition-colors shadow-md"
                         >
@@ -266,7 +270,7 @@ function Settlement({openRouter}) {
                     {qr_data.for ? (
                         <>
                             <span className="text-sm text-gray-500 font-medium mb-1">QR code for <b className="text-black">{qr_data.for}</b> 📸</span>
-                            <h4 className="text-sm font-bold mb-4">Scan to pay <span className="text-green-600">₹{qr_data.amount}</span> 💸</h4>
+                            <h4 className="text-sm font-bold mb-4">Scan to pay <span className="text-green-600">₹{qr_data.amount.toFixed(2)}</span> 💸</h4>
                         </>
                     ) : (
                         <span className="text-sm text-gray-400 italic mb-4">Select a transaction above to generate QR 👆</span>

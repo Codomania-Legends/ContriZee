@@ -96,6 +96,14 @@ function Select_Expense() {
             exit={{ opacity: 0 }}
             className="max-w-md mx-auto p-6 min-h-screen pb-32"
         >
+
+            <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="mb-6 text-center"
+            >
+                <button className="text-gray-400 absolute top-4 left-4" onClick={() => navigate('/add-members')}> 🔙 Back</button>
+            </motion.div>
             
             {/* Header: Show which trip we are adding to! 📍🗺️ */}
             <motion.div 

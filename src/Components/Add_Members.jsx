@@ -207,7 +207,7 @@ function Add_Members() {
                         console.log(Cookies.get("activeTrip"));
                         navigate("/select-expense")
                     }}
-                    className={`w-[30%] py-4 rounded-2xl font-bold transition-colors small-box-shadow ${
+                    className={`md:w-[30%] w-[80%] py-4 rounded-2xl font-bold transition-colors small-box-shadow ${
                         canGoNext ? 'bg-green-500 text-white' : 'bg-[#C599B6] text-white opacity-80'
                     }`}
                 >

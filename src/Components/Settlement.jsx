@@ -135,7 +135,7 @@ function Settlement({openRouter}) {
             </div>
 
             {/* Clay Graph Container - RESPONSIVE & STYLED */}
-            <div className="rounded-[2rem] md:rounded-[3rem] p-4 md:p-12 mb-12 flex justify-center items-center overflow-visible w-full max-w-5xl mx-auto">
+            <div className="rounded-4xl md:rounded-[3rem] p-4 md:p-12 mb-12 flex justify-center items-center overflow-visible w-full max-w-5xl mx-auto">
                 <Xwrapper>
                     <div 
                         className="relative z-10 touch-none transition-all duration-500 ease-in-out" 
@@ -163,7 +163,7 @@ function Settlement({openRouter}) {
                                     className={`flex items-center justify-center rounded-full small-box-shadow font-bold z-20 transition-all duration-300 ${pendingTransaction ? 'cursor-pointer hover:scale-105 ring-white/50 hover:ring-4' : 'cursor-default'}`}
                                 >
                                     {showOptions === index && (
-                                        <div className="options-popup absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-[999] bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-xl border border-white/50">
+                                        <div className="options-popup absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-999 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-xl border border-white/50">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); handleAsk(pendingTransaction); }}
                                                 className="bg-blue-500 text-white text-[10px] md:text-xs px-4 py-2 rounded-full shadow-md whitespace-nowrap hover:bg-blue-600 active:scale-95 transition-all"
@@ -199,7 +199,7 @@ function Settlement({openRouter}) {
             <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                 
                 {/* Active Debts Clay Card */}
-                <div className="bg-white p-8 big-box-shadow rounded-[2rem] flex flex-col h-full">
+                <div className="bg-white p-8 big-box-shadow rounded-4xl flex flex-col h-full">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-3 bg-[#d3d3d3] rounded-xl small-box-shadow text-xl">📋</div>
                         <h3 className="font-extrabold text-xl text-gray-800 m-0">Active Debts</h3>
@@ -228,7 +228,7 @@ function Settlement({openRouter}) {
                 </div>
 
                 {/* Fast Pay Clay Card */}
-                <div className="bg-white p-8 big-box-shadow rounded-[2rem] flex flex-col h-full">
+                <div className="bg-white p-8 big-box-shadow rounded-4xl flex flex-col h-full">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-3 bg-[#d3d3d3] rounded-xl small-box-shadow text-xl">⚡</div>
                         <h3 className="font-extrabold text-xl text-gray-800 m-0">Fast Pay UPI</h3>

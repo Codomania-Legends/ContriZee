@@ -51,7 +51,7 @@ function Signup() {
 
     return (
         <div className='flex justify-center items-center h-screen'>
-            <div className='w-[60%] h-full flex justify-center items-center relative'>
+            <div className='w-[60%] h-full hidden lg:flex justify-center items-center relative'>
                 <img 
                     src="/BGlogin.svg" 
                     alt="background" 
@@ -63,10 +63,9 @@ function Signup() {
                 </div>
             </div>
             
-            <div className='w-[40%] h-[50%] flex justify-center items-center flex-col'>
-                <div className='w-[70%] h-full bg-white small-box-shadow rounded-4xl flex justify-center items-center flex-col'>
-                    <h1 className='text-2xl font-["Syne"] mb-4 font-extrabold'>New Account? ✨</h1>
-                    
+            <div className='lg:w-[40%] h-[50%] w-full flex justify-center items-center flex-col'>
+                <div className='lg:w-[70%] w-[80%] h-full bg-white small-box-shadow rounded-4xl flex justify-center items-center flex-col'>
+                    <h1 className='lg:text-2xl text-xl font-["Syne"] mb-4 font-extrabold'>New Account? ✨</h1>
                     <form onSubmit={HandleSubmit} className='h-[70%] w-[80%] flex justify-around items-center flex-col'>
                         <div className='flex h-[20%] w-full justify-center items-start flex-col'>
                             <input 

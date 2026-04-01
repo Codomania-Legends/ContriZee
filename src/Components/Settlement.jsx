@@ -156,11 +156,11 @@ function Settlement({openRouter}) {
         <div className="p-4 md:p-10 font-sans w-full flex flex-col items-center relative min-h-screen  text-gray-800">
             
             {/* Clay Header */}
-            <div className="flex items-center justify-between mb-10 max-w-5xl mx-auto w-full  rounded-full px-6 py-4">
+            <div className="flex items-center justify-between  mb-10 max-w-5xl mx-auto w-full  rounded-full px-6 py-4">
                 <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-black font-semibold px-4 transition-colors flex items-center gap-2">
-                    <span className="hidden md:inline">← Back</span>
+                   ←<span className="hidden md:inline">Back</span>
                 </button>
-                <h2 className="text-xl md:text-2xl font-bold text-center m-0 text-gray-800 tracking-wide">Settlement Plan 💸</h2>
+                <h2 className="text-md md:text-2xl font-bold text-center m-0 text-gray-800 tracking-wide">Settlement Plan 💸</h2>
                 <div className="w-[80px]"></div> {/* Spacer to maintain center alignment */}
             </div>
 

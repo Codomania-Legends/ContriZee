@@ -59,7 +59,7 @@ const Layout = ({openRouter}) => {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className='absolute md:left-10 left-25 fixed md:bottom-5 bottom-20 small-box-shadow bg-[#C8A2C8] text-white rounded-full px-4 py-2' 
+      className='absolute md:left-10 left-25 fixed md:bottom-5 bottom-25 small-box-shadow bg-[#C8A2C8] text-white rounded-full px-4 py-2' 
         onClick={() => {
           sileo.promise(WhoPaysNext(members, expenses, openRouter), {
             loading: {
